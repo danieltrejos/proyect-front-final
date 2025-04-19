@@ -8,17 +8,18 @@ import { usePathname } from "next/navigation"
 import { Beer, ClipboardList, Home, LayoutDashboard, Menu, Package, ShoppingCart, Users, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import Image from "next/image"
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
   const routes = [
-    {
+    /* {
       href: "/",
       label: "Vista General",
       icon: <Home className="h-5 w-5" />,
-    },
+    }, */
     {
       href: "/products",
       label: "Productos",
@@ -98,8 +99,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       <div className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r">
         <div className="flex flex-col h-full">
           <div className="flex items-center gap-2 p-6 border-b">
-            <LayoutDashboard className="h-6 w-6" />
-            <h2 className="text-lg font-bold">Rock Bar</h2>
+            {/* <LayoutDashboard className="h-6 w-6" /> */}
+            <Image
+              src="/logo-m.png"
+              alt="Metropolitan Logo"
+              width={64}
+              height={64}
+              className="hidden lg:block w-8 h-8 rounded-full"
+            />
+            <h2 className="text-lg font-bold">Metropolitan</h2>
           </div>
           <nav className="flex-1 p-4 space-y-2">
             {routes.map((route) => (
