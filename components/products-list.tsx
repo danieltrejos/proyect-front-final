@@ -308,23 +308,23 @@ export function ProductsList() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Products</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Productos</h1>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Add Product
+              Agregar producto
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Add New Product</DialogTitle>
-              <DialogDescription>Add a new beer product to your inventory.</DialogDescription>
+              <DialogTitle>Agrega un nuevo producto</DialogTitle>
+              <DialogDescription>Añade un nuevo producto de cerveza a tu inventario.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="name" className="text-right">
-                  Name
+                  Nombre
                 </Label>
                 <Input
                   id="name"
@@ -336,7 +336,7 @@ export function ProductsList() {
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="type" className="text-right">
-                  Type
+                  Tipo
                 </Label>
                 <Input
                   id="type"
@@ -348,7 +348,7 @@ export function ProductsList() {
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="price" className="text-right">
-                  Price
+                  Precio
                 </Label>
                 <Input
                   id="price"
@@ -375,7 +375,7 @@ export function ProductsList() {
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="description" className="text-right">
-                  Description
+                  Descripción
                 </Label>
                 <Textarea
                   id="description"
@@ -388,9 +388,9 @@ export function ProductsList() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                Cancel
+                Cancelar
               </Button>
-              <Button onClick={handleAddProduct}>Add Product</Button>
+              <Button onClick={handleAddProduct}>Agregar producto</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -398,8 +398,8 @@ export function ProductsList() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Beer Products</CardTitle>
-          <CardDescription>Manage your beer inventory and product details.</CardDescription>
+          <CardTitle>Productos de cerveza</CardTitle>
+          <CardDescription>Administre su inventario de cerveza y los detalles del producto.</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -410,18 +410,18 @@ export function ProductsList() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Price</TableHead>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Tipo</TableHead>
+                  <TableHead>Precio</TableHead>
                   <TableHead>Stock</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {products.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center">
-                      No products found
+                      Productos no encontrados
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -436,18 +436,18 @@ export function ProductsList() {
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
                               <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Open menu</span>
+                              <span className="sr-only">Abrir menu</span>
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                             <DropdownMenuItem onClick={() => openEditDialog(product)}>
                               <Edit className="mr-2 h-4 w-4" />
-                              Edit
+                              Editar
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleDeleteProduct(product.id)}>
                               <Trash className="mr-2 h-4 w-4" />
-                              Delete
+                              Eliminar
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -464,13 +464,13 @@ export function ProductsList() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Product</DialogTitle>
-            <DialogDescription>Update the details of your beer product.</DialogDescription>
+            <DialogTitle>Editar productos</DialogTitle>
+            <DialogDescription>Actualice los detalles de su producto</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-name" className="text-right">
-                Name
+                Nombre
               </Label>
               <Input
                 id="edit-name"
@@ -482,7 +482,7 @@ export function ProductsList() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-type" className="text-right">
-                Type
+                Tipo
               </Label>
               <Input
                 id="edit-type"
@@ -494,7 +494,7 @@ export function ProductsList() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-price" className="text-right">
-                Price
+                Precio
               </Label>
               <Input
                 id="edit-price"
@@ -521,7 +521,7 @@ export function ProductsList() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-description" className="text-right">
-                Description
+                Descripcion
               </Label>
               <Textarea
                 id="edit-description"
@@ -534,9 +534,9 @@ export function ProductsList() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-              Cancel
+              Cancelar
             </Button>
-            <Button onClick={handleEditProduct}>Save Changes</Button>
+            <Button onClick={handleEditProduct}>Guardar cambios</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
