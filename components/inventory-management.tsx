@@ -207,13 +207,13 @@ export function InventoryManagement() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Inventory Management</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Gestión de inventario</h1>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Beer Inventory</CardTitle>
-          <CardDescription>Monitor and manage your beer stock levels.</CardDescription>
+          <CardTitle>Inventario de Cervezas</CardTitle>
+          <CardDescription>Monitore y gestione el nivel de cervezas.</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -226,25 +226,25 @@ export function InventoryManagement() {
                 <TableRow>
                   <TableHead>
                     <Button variant="ghost" onClick={() => handleSort("name")}>
-                      Name
+                      Nombre
                       <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
                   </TableHead>
-                  <TableHead>Type</TableHead>
+                  <TableHead>Tipo</TableHead>
                   <TableHead>
                     <Button variant="ghost" onClick={() => handleSort("stock")}>
                       Stock
                       <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
                   </TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sortedProducts.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center">
-                      No products found
+                      No se encontraron productos
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -254,13 +254,13 @@ export function InventoryManagement() {
                       <TableCell>{product.type}</TableCell>
                       <TableCell>
                         <span className={`px-2 py-1 rounded-md ${getLowStockStatus(product.stock)}`}>
-                          {product.stock} units
+                          {product.stock} unidades
                         </span>
                       </TableCell>
                       <TableCell className="text-right">
                         <Button variant="outline" size="sm" onClick={() => openRestockDialog(product)}>
                           <RefreshCw className="mr-2 h-4 w-4" />
-                          Restock
+                          Reabastecer
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -275,15 +275,15 @@ export function InventoryManagement() {
       <Dialog open={isRestockDialogOpen} onOpenChange={setIsRestockDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Restock Product</DialogTitle>
+            <DialogTitle>Reabastecer Productos</DialogTitle>
             <DialogDescription>
-              {currentProduct && `Add more units of ${currentProduct.name} to your inventory.`}
+              {currentProduct && `Agregar mas unidades de ${currentProduct.name} a tu inventario.`}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="restock-amount" className="text-right">
-                Amount
+                Cantidad para adicionar
               </Label>
               <Input
                 id="restock-amount"
@@ -295,14 +295,14 @@ export function InventoryManagement() {
             </div>
             {currentProduct && (
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Current Stock</Label>
-                <div className="col-span-3">{currentProduct.stock} units</div>
+                <Label className="text-right">Stock actual</Label>
+                <div className="col-span-3">{currentProduct.stock} unidades</div>
               </div>
             )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsRestockDialogOpen(false)}>
-              Cancel
+              Cancelar
             </Button>
             <Button onClick={handleRestock}>Restock</Button>
           </DialogFooter>

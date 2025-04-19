@@ -29,7 +29,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       label: "Inventario",
       icon: <Package className="h-5 w-5" />,
     },
-    {
+  /*  {
       href: "/pos",
       label: "Punto de venta",
       icon: <ShoppingCart className="h-5 w-5" />,
@@ -48,7 +48,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       href: "/customer-orders",
       label: "Pedidos de clientes",
       icon: <ClipboardList className="h-5 w-5" />,
-    },
+    }, */
     /* {
       href: "/users",
       label: "Users",
