@@ -56,8 +56,13 @@ export function ProductsList() {
     const fetchProducts = async () => {
       try {
         // In a real app, you would fetch from your API
-        // const response = await fetch('http://localhost:8000/api/v1/products')
-        // const data = await response.json()
+        const response = await fetch('http://localhost:8000/api/v1/products')
+        const data = await response.json()
+        console.log(data)
+        /* 
+        setProducts(data)
+        setIsLoading(false)
+ */
 
         // For demo purposes, using mock data
         setTimeout(() => {
