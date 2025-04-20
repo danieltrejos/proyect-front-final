@@ -299,6 +299,7 @@ export function ProductsList() {
           setIsAddDialogOpen(isOpen);
           if (!isOpen) setFormData(initialFormData); // Limpiar form al cerrar
         }}>
+
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
@@ -311,6 +312,7 @@ export function ProductsList() {
               <DialogTitle>Agrega un nuevo producto</DialogTitle>
               <DialogDescription>Añade un nuevo producto a tu inventario.</DialogDescription>
             </DialogHeader>
+
             {/* Formulario de Añadir (asegúrate que los 'name' coincidan con formData) */}
             <div className="grid gap-4 py-4">
               {/* Input Nombre */}
@@ -318,21 +320,31 @@ export function ProductsList() {
                 <Label htmlFor="name" className="text-right">Nombre</Label>
                 <Input id="name" name="name" value={formData.name} onChange={handleInputChange} className="col-span-3" />
               </div>
+
               {/* Input Tipo */}
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="type" className="text-right">Tipo</Label>
                 <Input id="type" name="type" value={formData.type} onChange={handleInputChange} className="col-span-3" placeholder="Ej: Laptop, Cerveza, Ropa (opcional)" />
               </div>
+
               {/* Input Precio */}
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="price" className="text-right">Precio</Label>
                 <Input id="price" name="price" type="number" step="0.01" min="0" value={formData.price} onChange={handleInputChange} className="col-span-3" />
               </div>
+
               {/* Input Stock */}
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="stock" className="text-right">Stock</Label>
                 <Input id="stock" name="stock" type="number" step="1" min="0" value={formData.stock} onChange={handleInputChange} className="col-span-3" />
               </div>
+
+              {/* Input URL-image */}
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="image" className="text-right">URL Imagen</Label>
+                <Input id="image" name="image" value={formData.image} onChange={handleInputChange} className="col-span-3" />
+              </div>
+
               {/* Input Descripción */}
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="description" className="text-right">Descripción</Label>
@@ -448,6 +460,7 @@ export function ProductsList() {
             <DialogTitle>Editar Producto</DialogTitle>
             <DialogDescription>Actualiza los detalles de tu producto.</DialogDescription>
           </DialogHeader>
+
           {/* Formulario de Editar (usa el mismo estado formData, poblado por openEditDialog) */}
           <div className="grid gap-4 py-4">
             {/* Input Nombre */}
@@ -455,26 +468,37 @@ export function ProductsList() {
               <Label htmlFor="edit-name" className="text-right">Nombre</Label>
               <Input id="edit-name" name="name" value={formData.name} onChange={handleInputChange} className="col-span-3" />
             </div>
+
             {/* Input Tipo */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-type" className="text-right">Tipo</Label>
               <Input id="edit-type" name="type" value={formData.type} onChange={handleInputChange} className="col-span-3" placeholder="Ej: Laptop, Cerveza (opcional)" />
             </div>
+
             {/* Input Precio */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-price" className="text-right">Precio</Label>
               <Input id="edit-price" name="price" type="number" step="0.01" min="0" value={formData.price} onChange={handleInputChange} className="col-span-3" />
             </div>
+
             {/* Input Stock */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-stock" className="text-right">Stock</Label>
               <Input id="edit-stock" name="stock" type="number" step="1" min="0" value={formData.stock} onChange={handleInputChange} className="col-span-3" />
             </div>
+
+            {/* Input URL-image */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="edit-type" className="text-right">URL imagen</Label>
+              <Input id="edit-type" name="type" value={formData.type} onChange={handleInputChange} className="col-span-3" placeholder="Ej: Laptop, Cerveza (opcional)" />
+            </div>
+
             {/* Input Descripción */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-description" className="text-right">Descripción</Label>
               <Textarea id="edit-description" name="description" value={formData.description} onChange={handleInputChange} className="col-span-3" />
             </div>
+
             {/* Opcional: Input Imagen */}
             {/* <div className="grid grid-cols-4 items-center gap-4">
                  <Label htmlFor="edit-image" className="text-right">URL Imagen</Label>
