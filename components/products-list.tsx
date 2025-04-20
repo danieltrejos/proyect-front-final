@@ -141,7 +141,7 @@ export function ProductsList() {
           stock: stockNumber,
           description: formData.description,
           //! Cambiar: enviar la URL de la imagen
-          // image: formData.image || 'URL_POR_DEFECTO_SI_APLICA'
+          image: formData.image || 'URL_POR_DEFECTO_SI_APLICA'
         }),
       })
 
@@ -275,7 +275,7 @@ export function ProductsList() {
     }
   }
 
-  // --- MODIFICACIÓN: Ajustar openEditDialog para manejar tipo null ---
+  //! --- MODIFICACIÓN: Ajustar openEditDialog para manejar tipo null ---
   const openEditDialog = (product: Product) => {
     setCurrentProduct(product)
     setFormData({
