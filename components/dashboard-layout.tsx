@@ -101,11 +101,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2 p-6 border-b">
             {/* <LayoutDashboard className="h-6 w-6" /> */}
             <Image
-              src="/logo-m.png"
+              src="/logo_oficial.png"
               alt="Metropolitan Logo"
               width={64}
               height={64}
-              className="hidden lg:block w-8 h-8 rounded-full"
+              className="hidden lg:block w-12 h-12 rounded-full"
             />
             <h2 className="text-lg font-bold">Metropolitan</h2>
           </div>
