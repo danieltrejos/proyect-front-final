@@ -22,10 +22,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 interface Product {
   id: number
   name: string
-  type: string
+  type: string | null
   price: number
   stock: number
   description: string
+  image?: string | null
+  createdAt?: string
+  updatedAt?: string
 }
 
 interface CartItem {
@@ -58,67 +61,31 @@ export function PosSystem() {
   const [selectedCustomer, setSelectedCustomer] = useState<string>("")
   const [selectedUser, setSelectedUser] = useState<string>("")
   const [searchTerm, setSearchTerm] = useState("")
+  
+  // URL del API de productos
+  const API_URL = "http://localhost:8000/api/v1/products"
 
   useEffect(() => {
     // Fetch products, customers, and users from your API
     const fetchData = async () => {
       try {
-        // In a real app, you would fetch from your API
-        // const productsResponse = await fetch('http://localhost:8000/api/v1/products')
-        // const customersResponse = await fetch('http://localhost:8000/api/v1/customers')
-        // const usersResponse = await fetch('http://localhost:8000/api/v1/users')
-        // const productsData = await productsResponse.json()
-        // const customersData = await customersResponse.json()
-        // const usersData = await usersResponse.json()
-
-        // For demo purposes, using mock data
-        setTimeout(() => {
-          const mockProducts: Product[] = [
-            {
-              id: 1,
-              name: "Club colombia",
-              type: "IPA",
-              price: 7.99,
-              stock: 48,
-              description: "A hoppy India Pale Ale with citrus notes",
-            },
-            {
-              id: 2,
-              name: "Costeña",
-              type: "Stout",
-              price: 8.49,
-              stock: 36,
-              description: "Rich and creamy stout with coffee undertones",
-            },
-            {
-              id: 3,
-              name: "Aguila",
-              type: "Lager",
-              price: 6.99,
-              stock: 72,
-              description: "Crisp and refreshing traditional lager",
-            },
-            {
-              id: 4,
-              name: "Aguila Light",
-              type: "Ale",
-              price: 7.49,
-              stock: 54,
-              description: "Medium-bodied amber ale with caramel notes",
-            },
-            {
-              id: 5,
-              name: "Poker",
-              type: "Wheat",
-              price: 7.29,
-              stock: 42,
-              description: "Light and refreshing wheat beer with citrus hints",
-            },
-            {
-              id: 6,
-              name: "Tres Cordilleras",
-              type: "Belgian",
-              price: 9.99,
+        // Obtenemos productos desde la API
+        setIsLoading(true);
+        console.log("Obteniendo productos desde:", API_URL);
+        const productsResponse = await fetch(API_URL);
+        
+        if (!productsResponse.ok) {
+          throw new Error(`Error HTTP al obtener productos: ${productsResponse.status}`);
+        }
+        
+        const productsData = await productsResponse.json();
+        console.log("Datos de productos obtenidos:", productsData);
+        
+        // Todavía usamos datos de prueba para clientes y usuarios
+        // En un futuro se podrían reemplazar por llamadas a API reales
+        
+        // For demo purposes, using mock data for customers and users
+        const mockCustomers: Customer[] = [
               stock: 24,
               description: "Strong Belgian-style tripel with fruity esters",
             },
