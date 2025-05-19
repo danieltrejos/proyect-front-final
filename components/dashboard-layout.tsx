@@ -30,11 +30,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       label: "Inventario",
       icon: <Package className="h-5 w-5" />,
     },
-  /*  {
+    {
       href: "/pos",
       label: "Punto de venta",
       icon: <ShoppingCart className="h-5 w-5" />,
     },
+    /*
     {
       href: "/sales-history",
       label: "Historial de ventas",

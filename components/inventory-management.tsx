@@ -26,6 +26,8 @@ interface Product {
   description: string
 }
 
+const API_URL = "http://localhost:8000/api/v1/products"
+
 export function InventoryManagement() {
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -35,9 +37,13 @@ export function InventoryManagement() {
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null)
   const [restockAmount, setRestockAmount] = useState("")
 
+
+
+
+
   useEffect(() => {
     // Fetch products from your API
-    const fetchProducts = async () => {
+    /* const fetchProducts = async () => {
       try {
         // In a real app, you would fetch from your API
         // const response = await fetch('http://localhost:8000/api/v1/products')
@@ -118,11 +124,32 @@ export function InventoryManagement() {
         console.error("Failed to fetch products:", error)
         setIsLoading(false)
       }
-    }
+    } */
 
     fetchProducts()
   }, [])
 
+
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch(API_URL)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const data: Product[] = await response.json()
+      setProducts(data)
+    } catch (error) {
+      console.error("Failed to fetch products:", error)
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los productos desde la API.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
   const handleSort = (column: "name" | "stock") => {
     if (sortBy === column) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc")
@@ -199,15 +226,15 @@ export function InventoryManagement() {
   }
 
   const getLowStockStatus = (stock: number) => {
-    if (stock <= 10) return "bg-red-500/10 text-red-500"
-    if (stock <= 20) return "bg-yellow-500/10 text-yellow-500"
+    if (stock <= 100) return "bg-red-500/10 text-red-500"
+    if (stock <= 200) return "bg-yellow-500/10 text-yellow-500"
     return ""
   }
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Gestión de inventario</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Sistema de inventario</h1>
       </div>
 
       <Card>

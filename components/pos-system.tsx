@@ -76,7 +76,7 @@ export function PosSystem() {
           const mockProducts: Product[] = [
             {
               id: 1,
-              name: "Hoppy IPA",
+              name: "Club colombia",
               type: "IPA",
               price: 7.99,
               stock: 48,
@@ -84,7 +84,7 @@ export function PosSystem() {
             },
             {
               id: 2,
-              name: "Dark Stout",
+              name: "Costeña",
               type: "Stout",
               price: 8.49,
               stock: 36,
@@ -92,7 +92,7 @@ export function PosSystem() {
             },
             {
               id: 3,
-              name: "Golden Lager",
+              name: "Aguila",
               type: "Lager",
               price: 6.99,
               stock: 72,
@@ -100,7 +100,7 @@ export function PosSystem() {
             },
             {
               id: 4,
-              name: "Amber Ale",
+              name: "Aguila Light",
               type: "Ale",
               price: 7.49,
               stock: 54,
@@ -108,7 +108,7 @@ export function PosSystem() {
             },
             {
               id: 5,
-              name: "Wheat Beer",
+              name: "Poker",
               type: "Wheat",
               price: 7.29,
               stock: 42,
@@ -116,7 +116,7 @@ export function PosSystem() {
             },
             {
               id: 6,
-              name: "Belgian Tripel",
+              name: "Tres Cordilleras",
               type: "Belgian",
               price: 9.99,
               stock: 24,
@@ -124,7 +124,7 @@ export function PosSystem() {
             },
             {
               id: 7,
-              name: "Sour Cherry",
+              name: "Andina",
               type: "Sour",
               price: 8.99,
               stock: 18,
@@ -132,7 +132,7 @@ export function PosSystem() {
             },
             {
               id: 8,
-              name: "Porter",
+              name: "Pilsen",
               type: "Porter",
               price: 7.99,
               stock: 30,
@@ -176,7 +176,7 @@ export function PosSystem() {
           const mockUsers: User[] = [
             {
               id: 1,
-              name: "Admin User",
+              name: "SuperAdmin",
               role: "admin",
             },
             {
@@ -210,7 +210,7 @@ export function PosSystem() {
     if (product.stock <= 0) {
       toast({
         title: "Error",
-        description: "This product is out of stock",
+        description: "Este producto no está disponible",
         variant: "destructive",
       })
       return
@@ -223,7 +223,7 @@ export function PosSystem() {
         if (existingItem.quantity >= product.stock) {
           toast({
             title: "Error",
-            description: "Cannot add more than available stock",
+            description: "No puede añadir mas del stock disponible",
             variant: "destructive",
           })
           return prevCart
@@ -268,7 +268,7 @@ export function PosSystem() {
       if (!selectedUser) {
         toast({
           title: "Error",
-          description: "Please select a user",
+          description: "Por favor selecciona un usuario",
           variant: "destructive",
         })
         return
@@ -279,7 +279,7 @@ export function PosSystem() {
       if (isNaN(amount)) {
         toast({
           title: "Error",
-          description: "Please enter a valid amount",
+          description: "Por favor ingresa un monto válido",
           variant: "destructive",
         })
         return
@@ -378,21 +378,21 @@ export function PosSystem() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Point of Sale</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Punto de venta</h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Beer Selection</CardTitle>
-              <CardDescription>Select beers to add to the customer's order.</CardDescription>
+              <CardTitle>Selección de cerveza</CardTitle>
+              <CardDescription>Selecciona una cerveza para añadir a la orden</CardDescription>
               <div className="flex flex-col gap-4 mt-2">
                 <div className="relative">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="search"
-                    placeholder="Search beers..."
+                    placeholder="Buscar cervezas..."
                     className="pl-8"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -435,7 +435,7 @@ export function PosSystem() {
                       <CardFooter className="p-4 pt-0">
                         <Button className="w-full" onClick={() => addToCart(product)} disabled={product.stock <= 0}>
                           <Plus className="mr-2 h-4 w-4" />
-                          Add to Order
+                          Añadir orden
                         </Button>
                       </CardFooter>
                     </Card>
@@ -451,15 +451,15 @@ export function PosSystem() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <ShoppingCart className="mr-2 h-5 w-5" />
-                Current Order
+                Orden actual
               </CardTitle>
               <CardDescription>
-                {cart.length === 0 ? "No items in order" : `${cart.length} items in order`}
+                {cart.length === 0 ? "No items en la orden" : `${cart.length} items en la orden`}
               </CardDescription>
               <div className="grid gap-2 mt-2">
                 <div className="grid grid-cols-4 items-center gap-2">
                   <Label htmlFor="customer" className="text-right text-sm">
-                    Customer
+                    Clientes
                   </Label>
                   <Select value={selectedCustomer} onValueChange={setSelectedCustomer}>
                     <SelectTrigger id="customer" className="col-span-3">
@@ -476,7 +476,7 @@ export function PosSystem() {
                 </div>
                 <div className="grid grid-cols-4 items-center gap-2">
                   <Label htmlFor="user" className="text-right text-sm">
-                    User
+                    Usuarios
                   </Label>
                   <Select value={selectedUser} onValueChange={setSelectedUser}>
                     <SelectTrigger id="user" className="col-span-3">
@@ -497,7 +497,7 @@ export function PosSystem() {
               {cart.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
                   <Beer className="h-12 w-12 mb-2" />
-                  <p>Add some beers to get started</p>
+                  <p>Añadir alguna cerveza para iniciar</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -591,7 +591,7 @@ export function PosSystem() {
                       </span>
                     </div>
                   ) : (
-                    <span className="text-muted-foreground">Walk-in customer</span>
+                    <span className="text-muted-foreground">Cliente de la calle</span>
                   )}
                 </div>
               </div>
