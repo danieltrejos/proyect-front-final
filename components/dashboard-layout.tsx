@@ -35,12 +35,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       label: "Punto de venta",
       icon: <ShoppingCart className="h-5 w-5" />,
     },
-    /*
+
     {
       href: "/sales-history",
       label: "Historial de ventas",
       icon: <ClipboardList className="h-5 w-5" />,
     },
+    /*
     {
       href: "/customers",
       label: "Clientes",
