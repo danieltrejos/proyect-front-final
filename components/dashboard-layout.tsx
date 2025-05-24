@@ -35,13 +35,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       label: "Punto de venta",
       icon: <ShoppingCart className="h-5 w-5" />,
     },
-
+/*
     {
       href: "/sales-history",
       label: "Historial de ventas",
       icon: <ClipboardList className="h-5 w-5" />,
     },
-    /*
+    
     {
       href: "/customers",
       label: "Clientes",
@@ -73,7 +73,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <div className="flex items-center justify-between p-4 border-b">
               <div className="flex items-center gap-2">
                 <LayoutDashboard className="h-6 w-6" />
-                <h2 className="text-lg font-bold">Metropolitan</h2>
+                <h2 className="text-lg font-bold">Bredsy</h2>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
                 <X className="h-5 w-5" />
@@ -109,7 +109,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               height={64}
               className="hidden lg:block w-12 h-12 rounded-full"
             />
-            <h2 className="text-lg font-bold">Metropolitan</h2>
+            <h2 className="text-lg font-bold">Bredsy</h2>
           </div>
           <nav className="flex-1 p-4 space-y-2">
             {routes.map((route) => (
