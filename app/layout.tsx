@@ -7,9 +7,9 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Metropolitan",
-  description: "Dashboard for Rock Bar inventory and sales management",
-  generator: 'v0.dev'
+  title: "Sistema de gestión de inventario - Bredsy",
+  description: "Dashboard para gestion de inventario",
+  generator: ''
 }
 
 export default function RootLayout({

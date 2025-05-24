@@ -37,10 +37,6 @@ export function InventoryManagement() {
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null)
   const [restockAmount, setRestockAmount] = useState("")
 
-
-
-
-
   useEffect(() => {
     // Fetch products from your API
     /* const fetchProducts = async () => {
@@ -129,8 +125,6 @@ export function InventoryManagement() {
     fetchProducts()
   }, [])
 
-
-
   const fetchProducts = async () => {
     try {
       const response = await fetch(API_URL)
@@ -172,7 +166,6 @@ export function InventoryManagement() {
     setRestockAmount("")
     setIsRestockDialogOpen(true)
   }
-
   const handleRestock = async () => {
     if (!currentProduct) return
 
@@ -182,44 +175,42 @@ export function InventoryManagement() {
       if (isNaN(amount) || amount <= 0) {
         toast({
           title: "Error",
-          description: "Please enter a valid amount",
+          description: "Por favor ingrese una cantidad válida",
           variant: "destructive",
         })
         return
-      }
-
-      // In a real app, you would send to your API
-      // const response = await fetch(`http://localhost:8000/api/v1/products/${currentProduct.id}/restock`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ amount })
-      // })
-      // const data = await response.json()
-
-      // For demo purposes, update the list
-      const updatedProducts = products.map((product) => {
-        if (product.id === currentProduct.id) {
-          return {
-            ...product,
-            stock: product.stock + amount,
-          }
-        }
-        return product
+      }      // Enviar solicitud al API para reabastecer el producto
+      const response = await fetch(`${API_URL}/${currentProduct.id}/restock`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount })
       })
 
-      setProducts(updatedProducts)
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Error HTTP: ${response.status}`)
+      }
+
+      // Obtener el producto actualizado desde la respuesta
+      const updatedProduct = await response.json()
+
+      // Actualizar la lista de productos localmente
+      setProducts(products.map(product =>
+        product.id === currentProduct.id ? updatedProduct : product
+      ))
+
       setIsRestockDialogOpen(false)
       setCurrentProduct(null)
 
       toast({
-        title: "Success",
-        description: `Restocked ${amount} units of ${currentProduct.name}`,
+        title: "Éxito",
+        description: `Se reabastecieron ${amount} unidades de ${currentProduct.name}`,
       })
     } catch (error) {
-      console.error("Failed to restock product:", error)
+      console.error("Error al reabastecer producto:", error)
       toast({
         title: "Error",
-        description: "Failed to restock product",
+        description: error instanceof Error ? error.message : "No se pudo reabastecer el producto",
         variant: "destructive",
       })
     }
@@ -235,6 +226,10 @@ export function InventoryManagement() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Sistema de inventario</h1>
+        <Button variant="outline" onClick={fetchProducts} disabled={isLoading}>
+          <RefreshCw className="mr-2 h-4 w-4" />
+          Actualizar inventario
+        </Button>
       </div>
 
       <Card>
@@ -326,12 +321,11 @@ export function InventoryManagement() {
                 <div className="col-span-3">{currentProduct.stock} unidades</div>
               </div>
             )}
-          </div>
-          <DialogFooter>
+          </div>          <DialogFooter>
             <Button variant="outline" onClick={() => setIsRestockDialogOpen(false)}>
               Cancelar
             </Button>
-            <Button onClick={handleRestock}>Restock</Button>
+            <Button onClick={handleRestock}>Reabastecer</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
