@@ -7,7 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Sistema de gestión de inventario - Bredsy",
+  title: "Sistema de gestión de inventario - Brewsy",
   description: "Dashboard para gestion de inventario",
   generator: ''
 }
@@ -19,9 +19,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        {/* Colocar el tema por defecto aque dark o vacio */}
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+      <body className={inter.className}>        {/* Configurado para mantener el tema oscuro siempre */}
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} forcedTheme="dark" disableTransitionOnChange>
           {children}
         </ThemeProvider>
       </body>

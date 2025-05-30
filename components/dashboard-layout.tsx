@@ -13,10 +13,9 @@ import Image from "next/image"
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
-
   const routes = [
     /* {
-      href: "/",
+      href: "/dashboard",
       label: "Vista General",
       icon: <Home className="h-5 w-5" />,
     }, */
@@ -37,18 +36,18 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     },
 /*
     {
-      href: "/sales-history",
+      href: "/dashboard/sales-history",
       label: "Historial de ventas",
       icon: <ClipboardList className="h-5 w-5" />,
     },
     
     {
-      href: "/customers",
+      href: "/dashboard/customers",
       label: "Clientes",
       icon: <Users className="h-5 w-5" />,
     },
     {
-      href: "/customer-orders",
+      href: "/dashboard/customer-orders",
       label: "Pedidos de clientes",
       icon: <ClipboardList className="h-5 w-5" />,
     }, */
@@ -73,7 +72,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <div className="flex items-center justify-between p-4 border-b">
               <div className="flex items-center gap-2">
                 <LayoutDashboard className="h-6 w-6" />
-                <h2 className="text-lg font-bold">Bredsy</h2>
+                <h2 className="text-lg font-bold">Brewsy</h2>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
                 <X className="h-5 w-5" />
@@ -109,7 +108,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               height={64}
               className="hidden lg:block w-12 h-12 rounded-full"
             />
-            <h2 className="text-lg font-bold">Bredsy</h2>
+            <h2 className="text-lg font-bold">Brewsy</h2>
           </div>
           <nav className="flex-1 p-4 space-y-2">
             {routes.map((route) => (
