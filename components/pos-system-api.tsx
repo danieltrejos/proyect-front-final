@@ -39,8 +39,10 @@ interface CartItem {
 interface Customer {
     id: number
     name: string
-    email: string
-    phone: string
+    email?: string
+    phone?: string
+    createdAt?: string
+    updatedAt?: string
 }
 
 interface User {
@@ -78,43 +80,20 @@ export function PosSystem() {
                     throw new Error(`Error HTTP al obtener productos: ${productsResponse.status}`);
                 }
 
-                const productsData = await productsResponse.json();
-                console.log("Datos de productos obtenidos:", productsData);
+                const productsData = await productsResponse.json();                console.log("Datos de productos obtenidos:", productsData);
                 setProducts(productsData);
 
-                // Datos mock para clientes
-                const mockCustomers: Customer[] = [
-                    {
-                        id: 1,
-                        name: "John Doe",
-                        email: "john.doe@example.com",
-                        phone: "555-123-4567",
-                    },
-                    {
-                        id: 2,
-                        name: "Jane Smith",
-                        email: "jane.smith@example.com",
-                        phone: "555-987-6543",
-                    },
-                    {
-                        id: 3,
-                        name: "Robert Johnson",
-                        email: "robert.johnson@example.com",
-                        phone: "555-456-7890",
-                    },
-                    {
-                        id: 4,
-                        name: "Maria Rodriguez",
-                        email: "maria.rodriguez@example.com",
-                        phone: "555-789-0123",
-                    },
-                    {
-                        id: 5,
-                        name: "David Wilson",
-                        email: "david.wilson@example.com",
-                        phone: "555-234-5678",
-                    },
-                ];
+                // Obtener clientes desde el backend
+                console.log("Cargando clientes desde:", "http://localhost:8000/api/v1/customers");
+                const customersResponse = await fetch("http://localhost:8000/api/v1/customers");
+                
+                if (!customersResponse.ok) {
+                    throw new Error(`Error HTTP al obtener clientes: ${customersResponse.status}`);
+                }
+
+                const customersData = await customersResponse.json();
+                console.log("Datos de clientes obtenidos:", customersData);
+                setCustomers(customersData);
 
                 // Datos mock para usuarios
                 const mockUsers: User[] = [
@@ -133,9 +112,7 @@ export function PosSystem() {
                         name: "Bartender 2",
                         role: "bartender",
                     },
-                ];
-
-                setCustomers(mockCustomers);
+                ];                setCustomers(customersData);
                 setUsers(mockUsers);
                 setSelectedUser(mockUsers[0].id.toString()); // Default to first user
 
@@ -496,7 +473,8 @@ export function PosSystem() {
                                         <div className="grid grid-cols-4 items-center gap-2">
                                             <Label htmlFor="customer" className="text-right">
                                                 Cliente
-                                            </Label>                                            <Select
+                                            </Label>
+                                            <Select
                                                 value={selectedCustomer}
                                                 onValueChange={setSelectedCustomer}
                                             >
