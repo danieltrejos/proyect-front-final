@@ -34,28 +34,29 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       label: "Punto de venta",
       icon: <ShoppingCart className="h-5 w-5" />,
     },
-/*
+
     {
-      href: "/dashboard/sales-history",
+      href: "/sales-history",
       label: "Historial de ventas",
       icon: <ClipboardList className="h-5 w-5" />,
     },
-    
+
     {
-      href: "/dashboard/customers",
+      href: "/customers",
       label: "Clientes",
       icon: <Users className="h-5 w-5" />,
     },
+
     {
-      href: "/dashboard/customer-orders",
+      href: "/customer-orders",
       label: "Pedidos de clientes",
       icon: <ClipboardList className="h-5 w-5" />,
-    }, */
-    /* {
+    },
+    {
       href: "/users",
       label: "Users",
       icon: <Users className="h-5 w-5" />,
-    } */,
+    },
   ]
 
   return (
@@ -124,11 +125,92 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             ))}
           </nav>
         </div>
-      </div>
-
-      {/* Main Content */}
+      </div>      {/* Main Content */}
       <div className="flex flex-col flex-1 lg:pl-64">
         <main className="flex-1 p-4 md:p-6">{children}</main>
+
+        {/* Footer */}
+        <footer className="py-8 px-4 md:px-6 bg-black text-white mt-auto">
+          <div className="container mx-auto max-w-7xl">
+            <div className="grid md:grid-cols-4 gap-8">
+              {/* Logo y descripción */}
+              <div>
+                <div className="flex items-center space-x-2 mb-4">
+                  <Image
+                    src="/logo_oficial.png"
+                    alt="Brewsy Logo"
+                    width={32}
+                    height={32}
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <span className="text-xl font-bold text-white">Brewsy</span>
+                </div>
+                <p className="text-gray-400 text-sm">
+                  La solución SaaS para la gestión inteligente de inventarios de bebidas alcohólicas.
+                </p>
+              </div>
+
+              {/* Producto */}
+              <div>
+                <h3 className="font-semibold text-white mb-4">Producto</h3>
+                <ul className="space-y-2 text-gray-400 text-sm">
+                  <li>
+                    <Link href="/products" className="hover:text-white transition-colors">
+                      Características
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/inventory" className="hover:text-white transition-colors">
+                      Precios
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/pos" className="hover:text-white transition-colors">
+                      Demo
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Soporte */}
+              <div>
+                <h3 className="font-semibold text-white mb-4">Soporte</h3>
+                <ul className="space-y-2 text-gray-400 text-sm">
+                  <li>
+                    <a href="#" className="hover:text-white transition-colors">
+                      Centro de ayuda
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white transition-colors">
+                      Documentación
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-white transition-colors">
+                      Manual de usuario
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Contacto */}
+              <div>
+                <h3 className="font-semibold text-white mb-4">Contacto</h3>
+                <ul className="space-y-2 text-gray-400 text-sm">
+                  <li>soporte@brewsy.com</li>
+                  <li>+57 312 345 6789</li>
+                  <li>www.brewsy.com</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Copyright */}
+            <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
+              <p>&copy; 2025 Brewsy. Todos los derechos reservados. Daniel Trejos - Armando Ledezma - José Ensuncho</p>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   )

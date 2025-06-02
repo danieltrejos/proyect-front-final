@@ -543,7 +543,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            <p>&copy; 2024 Brewsy. Todos los derechos reservados.</p>
+            <p>&copy; 2025 Brewsy. Todos los derechos reservados. Daniel Trejos - Armando Ledezma - José Ensuncho</p>
           </motion.div>
         </div>
       </motion.footer>
