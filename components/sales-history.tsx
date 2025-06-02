@@ -84,25 +84,48 @@ export function SalesHistory() {
         // Obtener ventas desde el backend
         console.log("📊 Fetching sales from:", "http://localhost:8000/api/v1/sales")
         const salesResponse = await fetch("http://localhost:8000/api/v1/sales")
-        
+
         if (!salesResponse.ok) {
           throw new Error(`HTTP error al obtener ventas: ${salesResponse.status}`)
-        }
-
-        const salesData = await salesResponse.json()
+        } const salesData = await salesResponse.json()
         console.log("✅ Sales data received:", salesData)
         setSales(salesData)
 
-        console.log("🎉 Sales history data loaded successfully")
+        // Obtener clientes para el filtro
+        console.log("👥 Fetching customers from:", "http://localhost:8000/api/v1/customers")
+        const customersResponse = await fetch("http://localhost:8000/api/v1/customers")
 
+        if (customersResponse.ok) {
+          const customersData = await customersResponse.json()
+          console.log("✅ Customers data received:", customersData)
+          setCustomers(customersData)
+        } else {
+          console.warn("⚠️ Could not fetch customers:", customersResponse.status)
+        }
+
+        // Obtener usuarios para el filtro
+        console.log("🔐 Fetching users from:", "http://localhost:8000/api/v1/users")
+        const usersResponse = await fetch("http://localhost:8000/api/v1/users")
+
+        if (usersResponse.ok) {
+          const usersData = await usersResponse.json()
+          console.log("✅ Users data received:", usersData)
+          setUsers(usersData)
+        } else {
+          console.warn("⚠️ Could not fetch users:", usersResponse.status)
+        }
+
+        console.log("🎉 Sales history data loaded successfully")
       } catch (error) {
         console.error("❌ Error loading sales history:", error)
         // Fallback to empty array on error
-        setSales([])      } finally {
+        setSales([])
+      } finally {
         setIsLoading(false)
       }
     }
-      fetchSalesHistory()
+
+    fetchSalesHistory()
   }, [])
 
   const filteredSales = sales.filter((sale) => {
@@ -153,17 +176,17 @@ export function SalesHistory() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Sales History</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Historial de ventas</h1>
         <Button onClick={exportToCSV}>
           <Download className="mr-2 h-4 w-4" />
-          Export CSV
+          Exportar a CSV
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Sales Records</CardTitle>
-          <CardDescription>View and filter your sales history.</CardDescription>
+          <CardTitle>Registro de ventas</CardTitle>
+          <CardDescription>Ver y filtrar el historial de ventas.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4 mb-6">
@@ -172,7 +195,7 @@ export function SalesHistory() {
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
-                  placeholder="Search by ID, customer, or product..."
+                  placeholder="Buscar por ID, Cliente, o producto..."
                   className="pl-8"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -184,7 +207,7 @@ export function SalesHistory() {
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-full sm:w-auto justify-start">
                     <Calendar className="mr-2 h-4 w-4" />
-                    {dateFilter ? format(dateFilter, "PPP") : "Filter by date"}
+                    {dateFilter ? format(dateFilter, "PPP") : "Filtrar por fecha"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -193,10 +216,10 @@ export function SalesHistory() {
               </Popover>
               <Select value={customerFilter} onValueChange={setCustomerFilter}>
                 <SelectTrigger className="w-full sm:w-[200px]">
-                  <SelectValue placeholder="Filter by customer" />
+                  <SelectValue placeholder="Filtrar por cliente" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Customers</SelectItem>
+                  <SelectItem value="all">Todos los clientes</SelectItem>
                   {customers.map((customer) => (
                     <SelectItem key={customer.id} value={customer.id.toString()}>
                       {customer.name}
@@ -209,7 +232,7 @@ export function SalesHistory() {
                   <SelectValue placeholder="Filter by user" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Users</SelectItem>
+                  <SelectItem value="all">Todos los usuarios</SelectItem>
                   {users.map((user) => (
                     <SelectItem key={user.id} value={user.id.toString()}>
                       {user.name}
@@ -219,7 +242,7 @@ export function SalesHistory() {
               </Select>
               {dateFilter && (
                 <Button variant="ghost" onClick={() => setDateFilter(undefined)} className="px-3">
-                  Clear Filters
+                  Limpiar filtro
                 </Button>
               )}
             </div>
@@ -235,44 +258,44 @@ export function SalesHistory() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>ID</TableHead>
-                    <TableHead>Date & Time</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>User</TableHead>
-                    <TableHead>Items</TableHead>
+                    <TableHead>Fecha y hora</TableHead>
+                    <TableHead>Cliente</TableHead>
+                    <TableHead>Usuario</TableHead>
+                    <TableHead>Articulos</TableHead>
                     <TableHead className="text-right">Total</TableHead>
-                    <TableHead>Payment</TableHead>
+                    <TableHead>Forma de pago</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredSales.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={7} className="text-center">
-                        No sales records found
+                        No se encontró registro de ventas
                       </TableCell>
                     </TableRow>
-                  ) : (                    filteredSales.map((sale) => (
-                      <TableRow key={sale.id}>
-                        <TableCell className="font-medium">{sale.id}</TableCell>
-                        <TableCell>{new Date(sale.createdAt).toLocaleString()}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-muted-foreground" />
-                            {sale.customer.name}
-                          </div>
-                        </TableCell>
-                        <TableCell>{sale.user.name}</TableCell>                        <TableCell>
-                          <ul className="list-disc list-inside">
-                            {sale.items.map((item, index) => (
-                              <li key={index}>
-                                {item.quantity}x {item.product.name}
-                              </li>
-                            ))}
-                          </ul>
-                        </TableCell>
-                        <TableCell className="text-right">${sale.total.toFixed(2)}</TableCell>
-                        <TableCell>{sale.paymentMethod}</TableCell>
-                      </TableRow>
-                    ))
+                  ) : (filteredSales.map((sale) => (
+                    <TableRow key={sale.id}>
+                      <TableCell className="font-medium">{sale.id}</TableCell>
+                      <TableCell>{new Date(sale.createdAt).toLocaleString()}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-muted-foreground" />
+                          {sale.customer.name}
+                        </div>
+                      </TableCell>
+                      <TableCell>{sale.user.name}</TableCell>                        <TableCell>
+                        <ul className="list-disc list-inside">
+                          {sale.items.map((item, index) => (
+                            <li key={index}>
+                              {item.quantity}x {item.product.name}
+                            </li>
+                          ))}
+                        </ul>
+                      </TableCell>
+                      <TableCell className="text-right">${sale.total.toFixed(2)}</TableCell>
+                      <TableCell>{sale.paymentMethod}</TableCell>
+                    </TableRow>
+                  ))
                   )}
                 </TableBody>
               </Table>
