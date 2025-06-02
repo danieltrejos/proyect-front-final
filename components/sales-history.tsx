@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Calendar, Download, Search, User } from "lucide-react"
+import { Calendar, Download, Search, User, ChevronLeft, ChevronRight, Filter, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -75,6 +75,18 @@ export function SalesHistory() {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [users, setUsers] = useState<User[]>([])
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(10)
+
+  // Date range filter states
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined)
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined)
+
+  // Amount range filter states
+  const [minAmount, setMinAmount] = useState<string>("")
+  const [maxAmount, setMaxAmount] = useState<string>("")
+
   useEffect(() => {
     const fetchSalesHistory = async () => {
       try {
@@ -127,7 +139,6 @@ export function SalesHistory() {
 
     fetchSalesHistory()
   }, [])
-
   const filteredSales = sales.filter((sale) => {
     // Filter by search term
     const searchMatch =
@@ -135,8 +146,19 @@ export function SalesHistory() {
       sale.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       sale.items.some((item) => item.product.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
-    // Filter by date
+    // Filter by single date (legacy support)
     const dateMatch = dateFilter ? new Date(sale.createdAt).toDateString() === dateFilter.toDateString() : true
+
+    // Filter by date range
+    const saleDate = new Date(sale.createdAt)
+    const startDateMatch = startDate ? saleDate >= startDate : true
+    const endDateMatch = endDate ? saleDate <= endDate : true
+    const dateRangeMatch = startDateMatch && endDateMatch
+
+    // Filter by amount range
+    const amountMatch =
+      (minAmount === "" || sale.total >= parseFloat(minAmount)) &&
+      (maxAmount === "" || sale.total <= parseFloat(maxAmount))
 
     // Filter by customer
     const customerMatch = customerFilter === "all" || sale.customer.id.toString() === customerFilter
@@ -144,10 +166,34 @@ export function SalesHistory() {
     // Filter by user
     const userMatch = userFilter === "all" || sale.user.id.toString() === userFilter
 
-    return searchMatch && dateMatch && customerMatch && userMatch
+    return searchMatch && dateMatch && dateRangeMatch && amountMatch && customerMatch && userMatch
   })
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredSales.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedSales = filteredSales.slice(startIndex, endIndex)
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, dateFilter, startDate, endDate, minAmount, maxAmount, customerFilter, userFilter])
+
+  const clearAllFilters = () => {
+    setSearchTerm("")
+    setDateFilter(undefined)
+    setStartDate(undefined)
+    setEndDate(undefined)
+    setMinAmount("")
+    setMaxAmount("")
+    setCustomerFilter("all")
+    setUserFilter("all")
+    setCurrentPage(1)
+  }
+
   const exportToCSV = () => {
-    // Create CSV content
+    // Create CSV content - export ALL filtered sales, not just current page
     const headers = ["ID", "Date", "Customer", "User", "Items", "Total", "Payment Method"]
     const rows = filteredSales.map((sale) => [
       sale.id,
@@ -188,10 +234,10 @@ export function SalesHistory() {
           <CardTitle>Registro de ventas</CardTitle>
           <CardDescription>Ver y filtrar el historial de ventas.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="flex-1">
-              <div className="relative">
+        <CardContent>          {/* Search Bar */}
+          <div className="flex flex-col gap-4 mb-6">
+            <div className="flex items-center gap-4">
+              <div className="relative flex-1">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
@@ -201,21 +247,72 @@ export function SalesHistory() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
+              <Button variant="outline" onClick={clearAllFilters}>
+                <X className="mr-2 h-4 w-4" />
+                Limpiar filtros
+              </Button>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4">
+
+            {/* Filters Row 1: Date filters */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full sm:w-auto justify-start">
+                  <Button variant="outline" className="justify-start">
                     <Calendar className="mr-2 h-4 w-4" />
-                    {dateFilter ? format(dateFilter, "PPP") : "Filtrar por fecha"}
+                    {dateFilter ? format(dateFilter, "PPP") : "Fecha específica"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <CalendarComponent mode="single" selected={dateFilter} onSelect={setDateFilter} initialFocus />
                 </PopoverContent>
               </Popover>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="justify-start">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {startDate ? format(startDate, "PPP") : "Fecha desde"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent mode="single" selected={startDate} onSelect={setStartDate} initialFocus />
+                </PopoverContent>
+              </Popover>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="justify-start">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {endDate ? format(endDate, "PPP") : "Fecha hasta"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent mode="single" selected={endDate} onSelect={setEndDate} initialFocus />
+                </PopoverContent>
+              </Popover>
+
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  placeholder="Monto mín."
+                  value={minAmount}
+                  onChange={(e) => setMinAmount(e.target.value)}
+                  className="w-full"
+                />
+                <Input
+                  type="number"
+                  placeholder="Monto máx."
+                  value={maxAmount}
+                  onChange={(e) => setMaxAmount(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            {/* Filters Row 2: Customer and User filters */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Select value={customerFilter} onValueChange={setCustomerFilter}>
-                <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectTrigger>
                   <SelectValue placeholder="Filtrar por cliente" />
                 </SelectTrigger>
                 <SelectContent>
@@ -227,9 +324,10 @@ export function SalesHistory() {
                   ))}
                 </SelectContent>
               </Select>
+
               <Select value={userFilter} onValueChange={setUserFilter}>
-                <SelectTrigger className="w-full sm:w-[200px]">
-                  <SelectValue placeholder="Filter by user" />
+                <SelectTrigger>
+                  <SelectValue placeholder="Filtrar por usuario" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos los usuarios</SelectItem>
@@ -240,11 +338,12 @@ export function SalesHistory() {
                   ))}
                 </SelectContent>
               </Select>
-              {dateFilter && (
-                <Button variant="ghost" onClick={() => setDateFilter(undefined)} className="px-3">
-                  Limpiar filtro
-                </Button>
-              )}
+            </div>
+
+            {/* Results summary */}
+            <div className="text-sm text-muted-foreground">
+              Mostrando {paginatedSales.length} de {filteredSales.length} ventas
+              {filteredSales.length !== sales.length && ` (filtrado de ${sales.length} total)`}
             </div>
           </div>
 
@@ -265,15 +364,14 @@ export function SalesHistory() {
                     <TableHead className="text-right">Total</TableHead>
                     <TableHead>Forma de pago</TableHead>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
+                </TableHeader>                <TableBody>
                   {filteredSales.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={7} className="text-center">
                         No se encontró registro de ventas
                       </TableCell>
                     </TableRow>
-                  ) : (filteredSales.map((sale) => (
+                  ) : (paginatedSales.map((sale) => (
                     <TableRow key={sale.id}>
                       <TableCell className="font-medium">{sale.id}</TableCell>
                       <TableCell>{new Date(sale.createdAt).toLocaleString()}</TableCell>
@@ -297,8 +395,64 @@ export function SalesHistory() {
                     </TableRow>
                   ))
                   )}
-                </TableBody>
-              </Table>
+                </TableBody>              </Table>
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {filteredSales.length > 0 && totalPages > 1 && (
+            <div className="flex items-center justify-between space-x-2 py-4">
+              <div className="text-sm text-muted-foreground">
+                Página {currentPage} de {totalPages}
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Anterior
+                </Button>
+
+                {/* Page numbers */}
+                <div className="flex items-center space-x-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter(page => {
+                      // Show first page, last page, current page, and pages around current
+                      return page === 1 ||
+                        page === totalPages ||
+                        Math.abs(page - currentPage) <= 1
+                    })
+                    .map((page, index, array) => (
+                      <div key={page} className="flex items-center">
+                        {/* Add ellipsis if there's a gap */}
+                        {index > 0 && array[index - 1] < page - 1 && (
+                          <span className="px-2 text-muted-foreground">...</span>
+                        )}
+                        <Button
+                          variant={currentPage === page ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setCurrentPage(page)}
+                          className="min-w-[40px]"
+                        >
+                          {page}
+                        </Button>
+                      </div>
+                    ))}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Siguiente
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>
