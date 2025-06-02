@@ -235,7 +235,8 @@ export function PosSystem() {
 
             const total = getCartTotal()
 
-            if (amount < total) {                toast({
+            if (amount < total) {
+                toast({
                     title: "Error",
                     description: "El monto de pago es menor que el total",
                     variant: "destructive",
