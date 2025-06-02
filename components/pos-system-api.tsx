@@ -48,7 +48,10 @@ interface Customer {
 interface User {
     id: number
     name: string
+    email: string
     role: string
+    createdAt?: string
+    updatedAt?: string
 }
 
 export function PosSystem() {
@@ -89,32 +92,25 @@ export function PosSystem() {
                 
                 if (!customersResponse.ok) {
                     throw new Error(`Error HTTP al obtener clientes: ${customersResponse.status}`);
-                }
-
-                const customersData = await customersResponse.json();
+                }                const customersData = await customersResponse.json();
                 console.log("Datos de clientes obtenidos:", customersData);
                 setCustomers(customersData);
 
-                // Datos mock para usuarios
-                const mockUsers: User[] = [
-                    {
-                        id: 1,
-                        name: "SuperAdmin",
-                        role: "admin",
-                    },
-                    {
-                        id: 2,
-                        name: "Bartender 1",
-                        role: "bartender",
-                    },
-                    {
-                        id: 3,
-                        name: "Bartender 2",
-                        role: "bartender",
-                    },
-                ];                setCustomers(customersData);
-                setUsers(mockUsers);
-                setSelectedUser(mockUsers[0].id.toString()); // Default to first user
+                // Obtener usuarios desde el backend
+                console.log("Cargando usuarios desde:", "http://localhost:8000/api/v1/users");
+                const usersResponse = await fetch("http://localhost:8000/api/v1/users");
+                
+                if (!usersResponse.ok) {
+                    throw new Error(`Error HTTP al obtener usuarios: ${usersResponse.status}`);
+                }
+
+                const usersData = await usersResponse.json();
+                console.log("Datos de usuarios obtenidos:", usersData);
+                setUsers(usersData);
+                  // Seleccionar el primer usuario por defecto
+                if (usersData.length > 0) {
+                    setSelectedUser(usersData[0].id.toString());
+                }
 
             } catch (error) {
                 console.error("Error al obtener datos:", error);
@@ -219,9 +215,8 @@ export function PosSystem() {
                     variant: "destructive",
                 })
                 return
-            }
-
-            // Preparar datos para la venta
+            }            // Preparar datos para la venta
+            const change = amount - total;
             const saleData = {
                 items: cart.map(item => ({
                     productId: item.product.id,
@@ -229,12 +224,14 @@ export function PosSystem() {
                     price: item.product.price
                 })),
                 total,
-                payment: amount,
-                customerId: selectedCustomer ? parseInt(selectedCustomer) : null,
+                paymentAmount: amount,
+                change: change,
+                paymentMethod: "Cash", // Default payment method
+                customerId: selectedCustomer ? parseInt(selectedCustomer) : undefined,
                 userId: parseInt(selectedUser)
             };
 
-            console.log("Enviando datos de venta:", saleData);            // Crear la venta en el backend
+            console.log("Enviando datos de venta:", saleData);// Crear la venta en el backend
             const response = await fetch('http://localhost:8000/api/v1/sales', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
