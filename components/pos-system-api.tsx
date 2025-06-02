@@ -235,8 +235,7 @@ export function PosSystem() {
 
             const total = getCartTotal()
 
-            if (amount < total) {
-                toast({
+            if (amount < total) {                toast({
                     title: "Error",
                     description: "El monto de pago es menor que el total",
                     variant: "destructive",
@@ -244,23 +243,34 @@ export function PosSystem() {
                 return
             }
 
-            // En una app real, enviarías a tu API
-            // const response = await fetch('http://localhost:8000/api/v1/sales', {
-            //   method: 'POST',
-            //   headers: { 'Content-Type': 'application/json' },
-            //   body: JSON.stringify({
-            //     items: cart.map(item => ({
-            //       productId: item.product.id,
-            //       quantity: item.quantity,
-            //       price: item.product.price
-            //     })),
-            //     total,
-            //     payment: amount,
-            //     customerId: selectedCustomer || null,
-            //     userId: selectedUser
-            //   })
-            // })
-            // const data = await response.json()
+            // Preparar datos para la venta
+            const saleData = {
+                items: cart.map(item => ({
+                    productId: item.product.id,
+                    quantity: item.quantity,
+                    price: item.product.price
+                })),
+                total,
+                payment: amount,
+                customerId: selectedCustomer ? parseInt(selectedCustomer) : null,
+                userId: parseInt(selectedUser)
+            };
+
+            console.log("Enviando datos de venta:", saleData);            // Crear la venta en el backend
+            const response = await fetch('http://localhost:8000/api/v1/sales', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(saleData)
+            })
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`Error HTTP ${response.status}:`, errorText);
+                throw new Error(`Error HTTP: ${response.status} - ${errorText}`)
+            }
+
+            const saleResponse = await response.json()
+            console.log("Venta creada exitosamente:", saleResponse)
 
             // Actualizar el stock de productos
             const updatedProducts = products.map((product) => {
@@ -485,16 +495,14 @@ export function PosSystem() {
                                         <div className="grid grid-cols-4 items-center gap-2">
                                             <Label htmlFor="customer" className="text-right">
                                                 Cliente
-                                            </Label>
-                                            <Select
+                                            </Label>                                            <Select
                                                 value={selectedCustomer}
                                                 onValueChange={setSelectedCustomer}
                                             >
                                                 <SelectTrigger className="col-span-3">
-                                                    <SelectValue placeholder="Walk-in customer" />
+                                                    <SelectValue placeholder="Cliente de paso" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="">Walk-in customer</SelectItem>
                                                     {customers.map((customer) => (
                                                         <SelectItem key={customer.id} value={customer.id.toString()}>
                                                             {customer.name}
