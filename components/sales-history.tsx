@@ -11,27 +11,58 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 
+// Backend response interfaces
+interface Product {
+  id: number
+  name: string
+  description?: string
+  price: number
+  stock: number
+  imageUrl?: string
+  categoryId?: number
+  createdAt?: string
+  updatedAt?: string
+}
+
+interface SaleItem {
+  id: number
+  quantity: number
+  price: number
+  saleId: number
+  productId: number
+  product: Product
+}
+
+interface Customer {
+  id: number
+  name: string
+  email?: string
+  phone?: string
+  createdAt?: string
+  updatedAt?: string
+}
+
+interface User {
+  id: number
+  name: string
+  email: string
+  createdAt?: string
+  updatedAt?: string
+}
+
 interface Sale {
   id: number
-  date: string
-  customer: {
-    id: number
-    name: string
-  }
-  user: {
-    id: number
-    name: string
-  }
-  items: {
-    product: {
-      id: number
-      name: string
-      price: number
-    }
-    quantity: number
-  }[]
+  customerId: number
+  userId: number
   total: number
+  paymentAmount: number
+  change: number
   paymentMethod: string
+  createdAt: string
+  updatedAt: string
+  customer: Customer
+  user: User
+  items: SaleItem[]
 }
 
 export function SalesHistory() {
@@ -41,157 +72,55 @@ export function SalesHistory() {
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined)
   const [customerFilter, setCustomerFilter] = useState<string>("all")
   const [userFilter, setUserFilter] = useState<string>("all")
-  const [customers, setCustomers] = useState<{ id: number; name: string }[]>([])
-  const [users, setUsers] = useState<{ id: number; name: string }[]>([])
+  const [customers, setCustomers] = useState<Customer[]>([])
+  const [users, setUsers] = useState<User[]>([])
 
   useEffect(() => {
-    // Fetch sales history from your API
     const fetchSalesHistory = async () => {
       try {
-        // In a real app, you would fetch from your API
-        // const response = await fetch('http://localhost:8000/api/v1/sales')
-        // const data = await response.json()
+        setIsLoading(true)
+        console.log("🔄 Cargando datos del historial de ventas...")
 
-        // For demo purposes, using mock data
-        setTimeout(() => {
-          const mockCustomers = [
-            { id: 1, name: "John Doe" },
-            { id: 2, name: "Jane Smith" },
-            { id: 3, name: "Robert Johnson" },
-            { id: 4, name: "Maria Rodriguez" },
-            { id: 5, name: "David Wilson" },
-          ]
+        // Obtener ventas desde el backend
+        console.log("📊 Fetching sales from:", "http://localhost:8000/api/v1/sales")
+        const salesResponse = await fetch("http://localhost:8000/api/v1/sales")
 
-          const mockUsers = [
-            { id: 1, name: "Admin User" },
-            { id: 2, name: "Bartender 1" },
-            { id: 3, name: "Bartender 2" },
-          ]
+        if (!salesResponse.ok) {
+          throw new Error(`HTTP error al obtener ventas: ${salesResponse.status}`)
+        } const salesData = await salesResponse.json()
+        console.log("✅ Sales data received:", salesData)
+        setSales(salesData)
 
-          const mockSales: Sale[] = [
-            {
-              id: 1,
-              date: "2023-04-15T20:30:00",
-              customer: mockCustomers[0],
-              user: mockUsers[1],
-              items: [
-                {
-                  product: {
-                    id: 1,
-                    name: "Hoppy IPA",
-                    price: 7.99,
-                  },
-                  quantity: 2,
-                },
-                {
-                  product: {
-                    id: 2,
-                    name: "Dark Stout",
-                    price: 8.49,
-                  },
-                  quantity: 1,
-                },
-              ],
-              total: 24.47,
-              paymentMethod: "Credit Card",
-            },
-            {
-              id: 2,
-              date: "2023-04-15T21:15:00",
-              customer: mockCustomers[1],
-              user: mockUsers[2],
-              items: [
-                {
-                  product: {
-                    id: 3,
-                    name: "Golden Lager",
-                    price: 6.99,
-                  },
-                  quantity: 4,
-                },
-              ],
-              total: 27.96,
-              paymentMethod: "Cash",
-            },
-            {
-              id: 3,
-              date: "2023-04-16T19:45:00",
-              customer: mockCustomers[2],
-              user: mockUsers[1],
-              items: [
-                {
-                  product: {
-                    id: 4,
-                    name: "Amber Ale",
-                    price: 7.49,
-                  },
-                  quantity: 2,
-                },
-                {
-                  product: {
-                    id: 7,
-                    name: "Sour Cherry",
-                    price: 8.99,
-                  },
-                  quantity: 1,
-                },
-              ],
-              total: 23.97,
-              paymentMethod: "Credit Card",
-            },
-            {
-              id: 4,
-              date: "2023-04-16T22:30:00",
-              customer: mockCustomers[3],
-              user: mockUsers[2],
-              items: [
-                {
-                  product: {
-                    id: 5,
-                    name: "Wheat Beer",
-                    price: 7.29,
-                  },
-                  quantity: 2,
-                },
-                {
-                  product: {
-                    id: 1,
-                    name: "Hoppy IPA",
-                    price: 7.99,
-                  },
-                  quantity: 1,
-                },
-              ],
-              total: 22.57,
-              paymentMethod: "Cash",
-            },
-            {
-              id: 5,
-              date: "2023-04-17T20:15:00",
-              customer: mockCustomers[4],
-              user: mockUsers[1],
-              items: [
-                {
-                  product: {
-                    id: 6,
-                    name: "Belgian Tripel",
-                    price: 9.99,
-                  },
-                  quantity: 3,
-                },
-              ],
-              total: 29.97,
-              paymentMethod: "Credit Card",
-            },
-          ]
+        // Obtener clientes para el filtro
+        console.log("👥 Fetching customers from:", "http://localhost:8000/api/v1/customers")
+        const customersResponse = await fetch("http://localhost:8000/api/v1/customers")
 
-          setSales(mockSales)
-          setCustomers(mockCustomers)
-          setUsers(mockUsers)
-          setIsLoading(false)
-        }, 1000)
+        if (customersResponse.ok) {
+          const customersData = await customersResponse.json()
+          console.log("✅ Customers data received:", customersData)
+          setCustomers(customersData)
+        } else {
+          console.warn("⚠️ Could not fetch customers:", customersResponse.status)
+        }
+
+        // Obtener usuarios para el filtro
+        console.log("🔐 Fetching users from:", "http://localhost:8000/api/v1/users")
+        const usersResponse = await fetch("http://localhost:8000/api/v1/users")
+
+        if (usersResponse.ok) {
+          const usersData = await usersResponse.json()
+          console.log("✅ Users data received:", usersData)
+          setUsers(usersData)
+        } else {
+          console.warn("⚠️ Could not fetch users:", usersResponse.status)
+        }
+
+        console.log("🎉 Sales history data loaded successfully")
       } catch (error) {
-        console.error("Failed to fetch sales history:", error)
+        console.error("❌ Error loading sales history:", error)
+        // Fallback to empty array on error
+        setSales([])
+      } finally {
         setIsLoading(false)
       }
     }
@@ -207,7 +136,7 @@ export function SalesHistory() {
       sale.items.some((item) => item.product.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
     // Filter by date
-    const dateMatch = dateFilter ? new Date(sale.date).toDateString() === dateFilter.toDateString() : true
+    const dateMatch = dateFilter ? new Date(sale.createdAt).toDateString() === dateFilter.toDateString() : true
 
     // Filter by customer
     const customerMatch = customerFilter === "all" || sale.customer.id.toString() === customerFilter
@@ -217,13 +146,12 @@ export function SalesHistory() {
 
     return searchMatch && dateMatch && customerMatch && userMatch
   })
-
   const exportToCSV = () => {
     // Create CSV content
     const headers = ["ID", "Date", "Customer", "User", "Items", "Total", "Payment Method"]
     const rows = filteredSales.map((sale) => [
       sale.id,
-      new Date(sale.date).toLocaleString(),
+      new Date(sale.createdAt).toLocaleString(),
       sale.customer.name,
       sale.user.name,
       sale.items.map((item) => `${item.quantity}x ${item.product.name}`).join(", "),
@@ -248,17 +176,17 @@ export function SalesHistory() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Sales History</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Historial de ventas</h1>
         <Button onClick={exportToCSV}>
           <Download className="mr-2 h-4 w-4" />
-          Export CSV
+          Exportar a CSV
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Sales Records</CardTitle>
-          <CardDescription>View and filter your sales history.</CardDescription>
+          <CardTitle>Registro de ventas</CardTitle>
+          <CardDescription>Ver y filtrar el historial de ventas.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4 mb-6">
@@ -267,7 +195,7 @@ export function SalesHistory() {
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
-                  placeholder="Search by ID, customer, or product..."
+                  placeholder="Buscar por ID, Cliente, o producto..."
                   className="pl-8"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -279,7 +207,7 @@ export function SalesHistory() {
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-full sm:w-auto justify-start">
                     <Calendar className="mr-2 h-4 w-4" />
-                    {dateFilter ? format(dateFilter, "PPP") : "Filter by date"}
+                    {dateFilter ? format(dateFilter, "PPP") : "Filtrar por fecha"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -288,10 +216,10 @@ export function SalesHistory() {
               </Popover>
               <Select value={customerFilter} onValueChange={setCustomerFilter}>
                 <SelectTrigger className="w-full sm:w-[200px]">
-                  <SelectValue placeholder="Filter by customer" />
+                  <SelectValue placeholder="Filtrar por cliente" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Customers</SelectItem>
+                  <SelectItem value="all">Todos los clientes</SelectItem>
                   {customers.map((customer) => (
                     <SelectItem key={customer.id} value={customer.id.toString()}>
                       {customer.name}
@@ -304,7 +232,7 @@ export function SalesHistory() {
                   <SelectValue placeholder="Filter by user" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Users</SelectItem>
+                  <SelectItem value="all">Todos los usuarios</SelectItem>
                   {users.map((user) => (
                     <SelectItem key={user.id} value={user.id.toString()}>
                       {user.name}
@@ -314,7 +242,7 @@ export function SalesHistory() {
               </Select>
               {dateFilter && (
                 <Button variant="ghost" onClick={() => setDateFilter(undefined)} className="px-3">
-                  Clear Filters
+                  Limpiar filtro
                 </Button>
               )}
             </div>
@@ -330,46 +258,44 @@ export function SalesHistory() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>ID</TableHead>
-                    <TableHead>Date & Time</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>User</TableHead>
-                    <TableHead>Items</TableHead>
+                    <TableHead>Fecha y hora</TableHead>
+                    <TableHead>Cliente</TableHead>
+                    <TableHead>Usuario</TableHead>
+                    <TableHead>Articulos</TableHead>
                     <TableHead className="text-right">Total</TableHead>
-                    <TableHead>Payment</TableHead>
+                    <TableHead>Forma de pago</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredSales.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={7} className="text-center">
-                        No sales records found
+                        No se encontró registro de ventas
                       </TableCell>
                     </TableRow>
-                  ) : (
-                    filteredSales.map((sale) => (
-                      <TableRow key={sale.id}>
-                        <TableCell className="font-medium">{sale.id}</TableCell>
-                        <TableCell>{new Date(sale.date).toLocaleString()}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-muted-foreground" />
-                            {sale.customer.name}
-                          </div>
-                        </TableCell>
-                        <TableCell>{sale.user.name}</TableCell>
-                        <TableCell>
-                          <ul className="list-disc list-inside">
-                            {sale.items.map((item, index) => (
-                              <li key={index}>
-                                {item.quantity}x {item.product.name}
-                              </li>
-                            ))}
-                          </ul>
-                        </TableCell>
-                        <TableCell className="text-right">${sale.total.toFixed(2)}</TableCell>
-                        <TableCell>{sale.paymentMethod}</TableCell>
-                      </TableRow>
-                    ))
+                  ) : (filteredSales.map((sale) => (
+                    <TableRow key={sale.id}>
+                      <TableCell className="font-medium">{sale.id}</TableCell>
+                      <TableCell>{new Date(sale.createdAt).toLocaleString()}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-muted-foreground" />
+                          {sale.customer.name}
+                        </div>
+                      </TableCell>
+                      <TableCell>{sale.user.name}</TableCell>                        <TableCell>
+                        <ul className="list-disc list-inside">
+                          {sale.items.map((item, index) => (
+                            <li key={index}>
+                              {item.quantity}x {item.product.name}
+                            </li>
+                          ))}
+                        </ul>
+                      </TableCell>
+                      <TableCell className="text-right">${sale.total.toFixed(2)}</TableCell>
+                      <TableCell>{sale.paymentMethod}</TableCell>
+                    </TableRow>
+                  ))
                   )}
                 </TableBody>
               </Table>
