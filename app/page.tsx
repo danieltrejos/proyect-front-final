@@ -70,7 +70,7 @@ export default function LandingPage() {
             <span className="text-2xl font-bold text-foreground">Brewsy</span>
           </motion.div>
           <nav className="hidden md:flex items-center space-x-8">
-            {['Características', 'Beneficios', 'Precios', 'Contacto'].map((item, index) => (
+            {['Características', 'Beneficios', 'Contacto'].map((item, index) => (
               <motion.a
                 key={item}
                 href={`#${item.toLowerCase()}`}
@@ -119,7 +119,7 @@ export default function LandingPage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.5 }}
             >
-              bebidas alcohólicas
+              bebidas
             </motion.span>
             de forma inteligente
           </motion.h1>
@@ -129,8 +129,8 @@ export default function LandingPage() {
             {...fadeInUp}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            Brewsy es la solución SaaS definitiva para bares, licorerías y restaurantes.
-            Controla tu stock, optimiza tus procesos y toma decisiones basadas en datos en tiempo real.
+            Brewsy es una solución SaaS  para bares, licorerías y restaurantes.
+            Controla stock, optimiza tus procesos y toma decisiones basadas en datos en tiempo real.
           </motion.p>
 
           <motion.div
@@ -147,7 +147,7 @@ export default function LandingPage() {
                 href="/dashboard"
                 className="bg-primary text-primary-foreground px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary/90 transition-colors inline-flex items-center gap-2 shadow-lg"
               >
-                Comenzar gratis
+                Comenzar
                 <motion.div
                   animate={{ x: [0, 4, 0] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
@@ -172,7 +172,7 @@ export default function LandingPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.8 }}
           >
-            ✓ Prueba gratuita de 14 días • ✓ No requiere tarjeta de crédito
+            ✓ Prueba gratuita de 7 días • ✓ No requiere tarjeta de crédito
           </motion.p>
         </div>
       </section>
@@ -191,7 +191,7 @@ export default function LandingPage() {
             {...fadeInUp}
             viewport={{ once: true }}
           >
-            Interfaz intuitiva y poderosa
+            Interfaz intuitiva y fluida
           </motion.h2>
           <motion.p
             className="text-muted-foreground mb-8"
@@ -199,7 +199,7 @@ export default function LandingPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            Diseñada específicamente para la gestión de inventarios de bebidas alcohólicas
+            Diseñada específicamente para la gestión de inventarios de bebidas para bares y licoreras.
           </motion.p>
           <motion.div
             className="bg-card rounded-lg shadow-2xl overflow-hidden max-w-6xl mx-auto"
@@ -239,7 +239,7 @@ export default function LandingPage() {
               Todo lo que necesitas para gestionar tu inventario
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Funcionalidades diseñadas específicamente para el sector de bebidas alcohólicas
+              Funcionalidades diseñadas específicamente para el sector de bebidas
             </p>
           </motion.div>
 
@@ -254,7 +254,7 @@ export default function LandingPage() {
               {
                 icon: Package,
                 title: "Gestión de Productos",
-                description: "Registra, edita y organiza tu inventario de bebidas por categorías, tipos y precios."
+                description: "Registra, edita y organiza tu inventario de bebidas por tipos y precios."
               },
               {
                 icon: BarChart3,
@@ -352,6 +352,10 @@ export default function LandingPage() {
                   {
                     title: "Ahorra tiempo",
                     description: "Automatiza procesos manuales y dedica más tiempo a tu negocio"
+                  },
+                  {
+                    title: "Gestiona ventas",
+                    description: "Automatiza procesos de ventas, visualiza historial y pedidos por clientes"
                   },
                   {
                     title: "Interfaz intuitiva",
@@ -455,7 +459,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            14 días de prueba gratuita • Sin compromisos
+            7 días de prueba gratuita • Sin compromisos
           </motion.p>
         </div>
       </motion.section>
@@ -492,7 +496,7 @@ export default function LandingPage() {
                 <span className="text-xl font-bold text-foreground">Brewsy</span>
               </motion.div>
               <p className="text-muted-foreground">
-                La solución SaaS para la gestión inteligente de inventarios de bebidas alcohólicas.
+                La solución SaaS para la gestión inteligente de inventarios de bebidas.
               </p>
             </motion.div>
 
