@@ -63,9 +63,9 @@ export default function LandingPage() {
             <Image
               src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo_oficial-46D02wUcP1RDrjJLGq04ZPBB4PSlQ5.png"
               alt="Brewsy Logo"
-              width={40}
-              height={40}
-              className="w-10 h-10"
+              width={64}
+              height={64}
+              className="w-14 h-14"
             />
             <span className="text-2xl font-bold text-foreground">Brewsy</span>
           </motion.div>
@@ -162,7 +162,13 @@ export default function LandingPage() {
               whileHover={{ scale: 1.05, borderColor: "hsl(var(--primary))" }}
               whileTap={{ scale: 0.95 }}
             >
-              Ver demo
+              <Link
+                href="https://drive.google.com/drive/folders/1SFxybBPXwc_j2yadmy4M7jZpYtNsE5Re?usp=sharing"
+                target="_blank"
+              >
+                Ver Manual
+              </Link>
+
             </motion.button>
           </motion.div>
 
