@@ -361,9 +361,8 @@ export function PosSystem() {
                                             <p className="col-span-full text-center text-muted-foreground py-8">
                                                 No se encontraron productos
                                             </p>
-                                        ) : (
-                                            getProductsByType().map((product) => (
-                                                <Card key={product.id} className="overflow-hidden">
+                                        ) : (                                            getProductsByType().map((product) => (
+                                                <Card key={product.id} className="overflow-hidden flex flex-col h-full">
                                                     <CardHeader className="p-4 pb-2">
                                                         <div className="flex justify-between">
                                                             <CardTitle className="text-base">{product.name}</CardTitle>
@@ -372,12 +371,11 @@ export function PosSystem() {
                                                             </span>
                                                         </div>
                                                         <CardDescription className="text-xs">{product.type}</CardDescription>
-                                                    </CardHeader>
-                                                    <CardContent className="p-4 pt-0">
+                                                    </CardHeader>                                                    <CardContent className="p-4 pt-0 flex-grow">
                                                         <p className="text-lg font-bold">${product.price.toFixed(2)}</p>
                                                         <p className="text-xs text-muted-foreground mt-1">{product.description}</p>
                                                     </CardContent>
-                                                    <CardFooter className="p-2 bg-muted/50">
+                                                    <CardFooter className="p-2 bg-muted/50 mt-auto">
                                                         <Button
                                                             onClick={() => addToCart(product)}
                                                             disabled={product.stock <= 0}

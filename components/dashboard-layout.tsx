@@ -78,9 +78,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <LayoutDashboard className="h-6 w-6" />
                 <h2 className="text-lg font-bold">Brewsy</h2>
               </div>
-              <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
-                <X className="h-5 w-5" />
-              </Button>
+
             </div>
             <nav className="flex-1 p-4 space-y-2">
               {routes.map((route) => (
