@@ -56,7 +56,7 @@ export function UsersList() {
     const fetchUsers = async () => {
       try {
         setIsLoading(true)
-        console.log("🔄 Fetching users from backend...")
+        console.log("Fetching users from backend...")
 
         const response = await fetch('http://localhost:8000/api/v1/users')
 
@@ -65,12 +65,12 @@ export function UsersList() {
         }
 
         const data = await response.json()
-        console.log("✅ Users data received:", data)
+        console.log("Users data received:", data)
 
         setUsers(data)
         setIsLoading(false)
       } catch (error) {
-        console.error("❌ Failed to fetch users:", error)
+        console.error("Failed to fetch users:", error)
         setIsLoading(false)
         toast({
           title: "Error",
@@ -104,7 +104,7 @@ export function UsersList() {
       if (!formData.name || !formData.email || !formData.role || !formData.password) {
         toast({
           title: "Error",
-          description: "Please fill all required fields",
+          description: "Por favor llenar todos los campos requeridos",
           variant: "destructive",
         })
         return
@@ -113,7 +113,7 @@ export function UsersList() {
       if (formData.password !== formData.confirmPassword) {
         toast({
           title: "Error",
-          description: "Passwords do not match",
+          description: "El password y la confirmación no coinciden",
           variant: "destructive",
         })
         return
@@ -172,7 +172,7 @@ export function UsersList() {
       if (!formData.name || !formData.email || !formData.role) {
         toast({
           title: "Error",
-          description: "Please fill all required fields",
+          description: "Por favor llenar todos los campos requeridos",
           variant: "destructive",
         })
         return
@@ -181,7 +181,7 @@ export function UsersList() {
       if (formData.password && formData.password !== formData.confirmPassword) {
         toast({
           title: "Error",
-          description: "Passwords do not match",
+          description: "El password y la confirmación no coinciden",
           variant: "destructive",
         })
         return
@@ -249,17 +249,17 @@ export function UsersList() {
   )
 
   // Debug log for filtered results
-  console.log("🔍 Search term:", searchTerm, "| Filtered users:", filteredUsers.length, "of", users.length)
+  console.log("Search term:", searchTerm, "| Filtered users:", filteredUsers.length, "of", users.length)
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Users</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Usuarios</h1>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Add User
+              Añadir usuario
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -270,7 +270,7 @@ export function UsersList() {
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="name" className="text-right">
-                  Name
+                  Nombre
                 </Label>
                 <Input
                   id="name"
@@ -295,7 +295,7 @@ export function UsersList() {
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="role" className="text-right">
-                  Role
+                  Rol
                 </Label>
                 <Select value={formData.role} onValueChange={handleSelectChange}>
                   <SelectTrigger id="role" className="col-span-3">
@@ -310,7 +310,7 @@ export function UsersList() {
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="password" className="text-right">
-                  Password
+                  Contraseña
                 </Label>
                 <Input
                   id="password"
@@ -323,7 +323,7 @@ export function UsersList() {
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="confirmPassword" className="text-right">
-                  Confirm
+                  Confirmar
                 </Label>
                 <Input
                   id="confirmPassword"
@@ -337,9 +337,9 @@ export function UsersList() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                Cancel
+                Cancelar
               </Button>
-              <Button onClick={handleAddUser}>Add User</Button>
+              <Button onClick={handleAddUser}>Añadir Usuario</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -347,8 +347,8 @@ export function UsersList() {
 
       <Card>
         <CardHeader>
-          <CardTitle>User Management</CardTitle>
-          <CardDescription>View and manage system users.</CardDescription>
+          <CardTitle>Gestión de usuarios</CardTitle>
+          <CardDescription>Ver y administrar los usuarios del sistema.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center mb-6">
@@ -356,7 +356,7 @@ export function UsersList() {
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search users..."
+                placeholder="Buscar usuarios..."
                 className="pl-8 w-full md:max-w-sm"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -371,19 +371,19 @@ export function UsersList() {
           ) : (
             <div className="rounded-md border">
               <Table>                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead className="hidden md:table-cell">Created</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
+                <TableRow>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Rol</TableHead>
+                  <TableHead className="hidden md:table-cell">Fecha de creación</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
                 <TableBody>
                   {filteredUsers.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center">
-                        No users found
+                        No se encontraron usuarios que coincidan con la búsqueda.
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -400,14 +400,14 @@ export function UsersList() {
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="icon">
                                 <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Open menu</span>
+                                <span className="sr-only">Abrir menú</span>
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                               <DropdownMenuItem onClick={() => openEditDialog(user)}>
                                 <Edit className="mr-2 h-4 w-4" />
-                                Edit
+                                Editar
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -425,13 +425,13 @@ export function UsersList() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
-            <DialogDescription>Update user information.</DialogDescription>
+            <DialogTitle>Editar Usuario</DialogTitle>
+            <DialogDescription>Actualizar información del usuario.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-name" className="text-right">
-                Name
+                Nombre
               </Label>
               <Input
                 id="edit-name"
@@ -456,7 +456,7 @@ export function UsersList() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-role" className="text-right">
-                Role
+                Rol
               </Label>
               <Select value={formData.role} onValueChange={handleSelectChange}>
                 <SelectTrigger id="edit-role" className="col-span-3">
@@ -471,7 +471,7 @@ export function UsersList() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-password" className="text-right">
-                New Password
+                Nueva Contraseña
               </Label>
               <Input
                 id="edit-password"
@@ -500,9 +500,9 @@ export function UsersList() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-              Cancel
+              Cancelar
             </Button>
-            <Button onClick={handleEditUser}>Save Changes</Button>
+            <Button onClick={handleEditUser}>Guardar cambios</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -235,23 +235,23 @@ export function CustomersList() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Módulo Clientes</h1>
         <Button onClick={openAddDialog}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Customer
+          Añadir cliente
         </Button>
       </div>
 
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New Customer</DialogTitle>
-            <DialogDescription>Add a new customer to your database.</DialogDescription>
+            <DialogTitle>Añadir nuevo cliente</DialogTitle>
+            <DialogDescription>Añadir un nuevo cliente a la base de datos.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">
-                Name
+                Nombre
               </Label>
               <Input
                 id="name"
@@ -277,7 +277,7 @@ export function CustomersList() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="phone" className="text-right">
-                Phone
+                Telefono
               </Label>                <Input
                 id="phone"
                 name="phone"
@@ -290,16 +290,16 @@ export function CustomersList() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={closeAddDialog}>
-              Cancel
+              Cancelar
             </Button>
-            <Button onClick={handleAddCustomer}>Add Customer</Button>            </DialogFooter>
+            <Button onClick={handleAddCustomer}>Añadir Cliente</Button>            </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Card>
         <CardHeader>
-          <CardTitle>Customer Management</CardTitle>
-          <CardDescription>View and manage your customer database.</CardDescription>
+          <CardTitle>Gestión de clientes</CardTitle>
+          <CardDescription>Ver y gestionar la base de datos de clientes.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center mb-6">
@@ -307,7 +307,7 @@ export function CustomersList() {
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search customers..."
+                placeholder="Buscar clientes..."
                 className="pl-8 w-full md:max-w-sm"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -323,11 +323,11 @@ export function CustomersList() {
             <div className="rounded-md border">              <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
+                  <TableHead>Nombre</TableHead>
                   <TableHead>Email</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead className="hidden md:table-cell">Created At</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>Telefono</TableHead>
+                  <TableHead className="hidden md:table-cell">Fecha de creación</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

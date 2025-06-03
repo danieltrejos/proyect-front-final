@@ -78,13 +78,13 @@ export function CustomerOrders() {
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [customers, setCustomers] = useState<Customer[]>([])
   useEffect(() => {
-    // Fetch sales and customers from the backend API
+    // Fetch ventas y clientes desde el backend
     const fetchData = async () => {
       try {
         setIsLoading(true)
         console.log("🔄 Fetching sales and customers from backend...")
 
-        // Fetch sales and customers in parallel
+        // Fetch en paralelo para ventas y clientes
         const [salesResponse, customersResponse] = await Promise.all([
           fetch('http://localhost:8000/api/v1/sales'),
           fetch('http://localhost:8000/api/v1/customers')
@@ -100,13 +100,14 @@ export function CustomerOrders() {
         const salesData = await salesResponse.json()
         const customersData = await customersResponse.json()
 
-        console.log("✅ Sales data received:", salesData)
-        console.log("✅ Customers data received:", customersData)
+        console.log("Sales data received:", salesData)
+        console.log("Customers data received:", customersData)
 
         setSales(salesData)
         setCustomers(customersData)
-        setIsLoading(false)      } catch (error) {
-        console.error("❌ Failed to fetch data:", error)
+        setIsLoading(false)
+      } catch (error) {
+        console.error("Failed to fetch data:", error)
         setIsLoading(false)
         toast({
           title: "Error",
@@ -149,19 +150,19 @@ export function CustomerOrders() {
   }, {})
   const getStatusBadge = (status: string = "completed") => {
     // Since backend sales don't have status, we'll default to completed
-    return <Badge className="bg-green-500">Completed</Badge>
+    return <Badge className="bg-green-500">Completado</Badge>
   }
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Customer Orders</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Módulo de pedido de clientes</h1>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Orders by Customer</CardTitle>
-          <CardDescription>View and filter orders grouped by customer.</CardDescription>
+          <CardTitle>Pedidos por cliente</CardTitle>
+          <CardDescription>Ver y filtrar pedidos agrupados por clientes.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4 mb-6">
@@ -170,7 +171,7 @@ export function CustomerOrders() {
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
-                  placeholder="Search by ID, customer, or product..."
+                  placeholder="Buscar por ID, cliente o producto..."
                   className="pl-8"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -182,7 +183,7 @@ export function CustomerOrders() {
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-full sm:w-auto justify-start">
                     <Calendar className="mr-2 h-4 w-4" />
-                    {dateFilter ? format(dateFilter, "PPP") : "Filter by date"}
+                    {dateFilter ? format(dateFilter, "PPP") : "Filtrar por fecha"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -191,10 +192,10 @@ export function CustomerOrders() {
               </Popover>
               <Select value={customerFilter} onValueChange={setCustomerFilter}>
                 <SelectTrigger className="w-full sm:w-[200px]">
-                  <SelectValue placeholder="Filter by customer" />
+                  <SelectValue placeholder="Filtrar por cliente" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Customers</SelectItem>
+                  <SelectItem value="all">Todos los clientes</SelectItem>
                   {customers.map((customer) => (
                     <SelectItem key={customer.id} value={customer.id.toString()}>
                       {customer.name}
@@ -207,10 +208,10 @@ export function CustomerOrders() {
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="in-progress">In Progress</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                  <SelectItem value="all">Todos los estados</SelectItem>
+                  <SelectItem value="completed">Completado</SelectItem>
+                  <SelectItem value="in-progress">En progreso</SelectItem>
+                  <SelectItem value="cancelled">Cancelado</SelectItem>
                 </SelectContent>
               </Select>
               {(dateFilter || customerFilter !== "all" || statusFilter !== "all") && (
@@ -223,7 +224,7 @@ export function CustomerOrders() {
                   }}
                   className="px-3"
                 >
-                  Clear Filters
+                  Limpiar Filtros
                 </Button>
               )}
             </div>
@@ -232,13 +233,13 @@ export function CustomerOrders() {
           {isLoading ? (
             <div className="flex items-center justify-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-            </div>          ) : Object.keys(salesByCustomer).length === 0 ? (
-            <div className="text-center py-10">
-              <ClipboardList className="mx-auto h-12 w-12 text-muted-foreground" />
-              <h3 className="mt-4 text-lg font-semibold">No orders found</h3>
-              <p className="text-muted-foreground">Try adjusting your filters</p>
-            </div>
-          ) : (
+            </div>) : Object.keys(salesByCustomer).length === 0 ? (
+              <div className="text-center py-10">
+                <ClipboardList className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-semibold">No se encontraron pedidos</h3>
+                <p className="text-muted-foreground">Prueba ajustando los filtros</p>
+              </div>
+            ) : (
             <Accordion type="single" collapsible className="w-full">
               {Object.entries(salesByCustomer).map(([customerId, customerSales]) => {
                 const customer = customers.find((c) => c.id.toString() === customerId)
@@ -250,7 +251,7 @@ export function CustomerOrders() {
                       <div className="flex items-center gap-2">
                         <User className="h-5 w-5" />                        <span>{customer.name}</span>
                         <Badge variant="outline" className="ml-2">
-                          {customerSales.length} orders
+                          {customerSales.length} pedidos
                         </Badge>
                       </div>
                     </AccordionTrigger>
@@ -259,13 +260,13 @@ export function CustomerOrders() {
                         <Table>
                           <TableHeader>
                             <TableRow>
-                              <TableHead>Order ID</TableHead>
-                              <TableHead>Date</TableHead>
-                              <TableHead>Items</TableHead>
+                              <TableHead>ID Pedido</TableHead>
+                              <TableHead>Fecha</TableHead>
+                              <TableHead>Articulos</TableHead>
                               <TableHead>Total</TableHead>
-                              <TableHead>Payment Method</TableHead>
-                              <TableHead>Status</TableHead>
-                              <TableHead>Served By</TableHead>
+                              <TableHead>Metodo de pago</TableHead>
+                              <TableHead>Estado</TableHead>
+                              <TableHead>Atendido por</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
