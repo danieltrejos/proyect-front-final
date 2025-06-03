@@ -111,7 +111,7 @@ export function CustomerOrders() {
         setIsLoading(false)
         toast({
           title: "Error",
-          description: "Failed to load orders and customers from server",
+          description: "Fallo al cargar los perdidos y clientes desde el servidor",
           variant: "destructive",
         })
       }
