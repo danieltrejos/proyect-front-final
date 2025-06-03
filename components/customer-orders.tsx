@@ -12,28 +12,52 @@ import { format } from "date-fns"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
+import { toast } from "@/components/ui/use-toast"
 
-interface Order {
+interface Sale {
   id: number
-  date: string
-  customer: {
-    id: number
-    name: string
-  }
-  user: {
-    id: number
-    name: string
-  }
+  total: number
+  paymentAmount: number
+  change: number
+  paymentMethod: string
+  createdAt: string
+  updatedAt: string
+  userId: number
+  customerId: number
   items: {
+    id: number
+    quantity: number
+    price: number
+    saleId: number
+    productId: number
     product: {
       id: number
       name: string
+      description: string
+      type: string
       price: number
+      image: string | null
+      stock: number
+      createdAt: string
+      updatedAt: string
     }
-    quantity: number
   }[]
-  total: number
-  status: "completed" | "in-progress" | "cancelled"
+  user: {
+    id: number
+    name: string
+    email: string
+    role: string
+    createdAt: string
+    updatedAt: string
+  }
+  customer: {
+    id: number
+    name: string
+    email: string
+    phone: string
+    createdAt: string
+    updatedAt: string
+  }
 }
 
 interface Customer {
@@ -41,250 +65,91 @@ interface Customer {
   name: string
   email: string
   phone: string
+  createdAt: string
+  updatedAt: string
 }
 
 export function CustomerOrders() {
-  const [orders, setOrders] = useState<Order[]>([])
+  const [sales, setSales] = useState<Sale[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined)
   const [customerFilter, setCustomerFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [customers, setCustomers] = useState<Customer[]>([])
-
   useEffect(() => {
-    // Fetch orders and customers from your API
+    // Fetch sales and customers from the backend API
     const fetchData = async () => {
       try {
-        // In a real app, you would fetch from your API
-        // const ordersResponse = await fetch('http://localhost:8000/api/v1/orders')
-        // const customersResponse = await fetch('http://localhost:8000/api/v1/customers')
-        // const ordersData = await ordersResponse.json()
-        // const customersData = await customersResponse.json()
+        setIsLoading(true)
+        console.log("🔄 Fetching sales and customers from backend...")
 
-        // For demo purposes, using mock data
-        setTimeout(() => {
-          const mockCustomers: Customer[] = [
-            {
-              id: 1,
-              name: "John Doe",
-              email: "john.doe@example.com",
-              phone: "555-123-4567",
-            },
-            {
-              id: 2,
-              name: "Jane Smith",
-              email: "jane.smith@example.com",
-              phone: "555-987-6543",
-            },
-            {
-              id: 3,
-              name: "Robert Johnson",
-              email: "robert.johnson@example.com",
-              phone: "555-456-7890",
-            },
-            {
-              id: 4,
-              name: "Maria Rodriguez",
-              email: "maria.rodriguez@example.com",
-              phone: "555-789-0123",
-            },
-            {
-              id: 5,
-              name: "David Wilson",
-              email: "david.wilson@example.com",
-              phone: "555-234-5678",
-            },
-          ]
+        // Fetch sales and customers in parallel
+        const [salesResponse, customersResponse] = await Promise.all([
+          fetch('http://localhost:8000/api/v1/sales'),
+          fetch('http://localhost:8000/api/v1/customers')
+        ])
 
-          const mockOrders: Order[] = [
-            {
-              id: 1001,
-              date: "2023-04-15T20:30:00",
-              customer: mockCustomers[0],
-              user: { id: 2, name: "Bartender 1" },
-              items: [
-                {
-                  product: {
-                    id: 1,
-                    name: "Hoppy IPA",
-                    price: 7.99,
-                  },
-                  quantity: 2,
-                },
-                {
-                  product: {
-                    id: 2,
-                    name: "Dark Stout",
-                    price: 8.49,
-                  },
-                  quantity: 1,
-                },
-              ],
-              total: 24.47,
-              status: "completed",
-            },
-            {
-              id: 1002,
-              date: "2023-04-15T21:15:00",
-              customer: mockCustomers[1],
-              user: { id: 3, name: "Bartender 2" },
-              items: [
-                {
-                  product: {
-                    id: 3,
-                    name: "Golden Lager",
-                    price: 6.99,
-                  },
-                  quantity: 4,
-                },
-              ],
-              total: 27.96,
-              status: "completed",
-            },
-            {
-              id: 1003,
-              date: "2023-04-16T19:45:00",
-              customer: mockCustomers[2],
-              user: { id: 2, name: "Bartender 1" },
-              items: [
-                {
-                  product: {
-                    id: 4,
-                    name: "Amber Ale",
-                    price: 7.49,
-                  },
-                  quantity: 2,
-                },
-                {
-                  product: {
-                    id: 7,
-                    name: "Sour Cherry",
-                    price: 8.99,
-                  },
-                  quantity: 1,
-                },
-              ],
-              total: 23.97,
-              status: "completed",
-            },
-            {
-              id: 1004,
-              date: "2023-04-18T18:30:00",
-              customer: mockCustomers[0],
-              user: { id: 3, name: "Bartender 2" },
-              items: [
-                {
-                  product: {
-                    id: 5,
-                    name: "Wheat Beer",
-                    price: 7.29,
-                  },
-                  quantity: 3,
-                },
-              ],
-              total: 21.87,
-              status: "completed",
-            },
-            {
-              id: 1005,
-              date: new Date().toISOString(),
-              customer: mockCustomers[3],
-              user: { id: 2, name: "Bartender 1" },
-              items: [
-                {
-                  product: {
-                    id: 6,
-                    name: "Belgian Tripel",
-                    price: 9.99,
-                  },
-                  quantity: 2,
-                },
-                {
-                  product: {
-                    id: 8,
-                    name: "Porter",
-                    price: 7.99,
-                  },
-                  quantity: 1,
-                },
-              ],
-              total: 27.97,
-              status: "in-progress",
-            },
-            {
-              id: 1006,
-              date: new Date().toISOString(),
-              customer: mockCustomers[4],
-              user: { id: 3, name: "Bartender 2" },
-              items: [
-                {
-                  product: {
-                    id: 1,
-                    name: "Hoppy IPA",
-                    price: 7.99,
-                  },
-                  quantity: 4,
-                },
-              ],
-              total: 31.96,
-              status: "in-progress",
-            },
-          ]
+        if (!salesResponse.ok) {
+          throw new Error(`Sales API error! status: ${salesResponse.status}`)
+        }
+        if (!customersResponse.ok) {
+          throw new Error(`Customers API error! status: ${customersResponse.status}`)
+        }
 
-          setOrders(mockOrders)
-          setCustomers(mockCustomers)
-          setIsLoading(false)
-        }, 1000)
-      } catch (error) {
-        console.error("Failed to fetch data:", error)
+        const salesData = await salesResponse.json()
+        const customersData = await customersResponse.json()
+
+        console.log("✅ Sales data received:", salesData)
+        console.log("✅ Customers data received:", customersData)
+
+        setSales(salesData)
+        setCustomers(customersData)
+        setIsLoading(false)      } catch (error) {
+        console.error("❌ Failed to fetch data:", error)
         setIsLoading(false)
+        toast({
+          title: "Error",
+          description: "Failed to load orders and customers from server",
+          variant: "destructive",
+        })
       }
     }
 
     fetchData()
   }, [])
-
-  const filteredOrders = orders.filter((order) => {
+  const filteredSales = sales.filter((sale) => {
     // Filter by search term
     const searchMatch =
-      order.id.toString().includes(searchTerm) ||
-      order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.items.some((item) => item.product.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      sale.id.toString().includes(searchTerm) ||
+      sale.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sale.items.some((item) => item.product.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
     // Filter by date
-    const dateMatch = dateFilter ? new Date(order.date).toDateString() === dateFilter.toDateString() : true
+    const dateMatch = dateFilter ? new Date(sale.createdAt).toDateString() === dateFilter.toDateString() : true
 
     // Filter by customer
-    const customerMatch = customerFilter === "all" || order.customer.id.toString() === customerFilter
+    const customerMatch = customerFilter === "all" || sale.customer.id.toString() === customerFilter
 
-    // Filter by status
-    const statusMatch = statusFilter === "all" || order.status === statusFilter
+    // For now, we'll consider all sales as "completed" since the backend doesn't have status
+    // Filter by status - we can add this logic later if needed
+    const statusMatch = statusFilter === "all" || statusFilter === "completed"
 
     return searchMatch && dateMatch && customerMatch && statusMatch
   })
 
-  // Group orders by customer
-  const ordersByCustomer = filteredOrders.reduce<Record<string, Order[]>>((acc, order) => {
-    const customerId = order.customer.id.toString()
+  // Group sales by customer
+  const salesByCustomer = filteredSales.reduce<Record<string, Sale[]>>((acc, sale) => {
+    const customerId = sale.customer.id.toString()
     if (!acc[customerId]) {
       acc[customerId] = []
     }
-    acc[customerId].push(order)
+    acc[customerId].push(sale)
     return acc
   }, {})
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "completed":
-        return <Badge className="bg-green-500">Completed</Badge>
-      case "in-progress":
-        return <Badge className="bg-yellow-500">In Progress</Badge>
-      case "cancelled":
-        return <Badge className="bg-red-500">Cancelled</Badge>
-      default:
-        return <Badge>{status}</Badge>
-    }
+  const getStatusBadge = (status: string = "completed") => {
+    // Since backend sales don't have status, we'll default to completed
+    return <Badge className="bg-green-500">Completed</Badge>
   }
 
   return (
@@ -367,8 +232,7 @@ export function CustomerOrders() {
           {isLoading ? (
             <div className="flex items-center justify-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-            </div>
-          ) : Object.keys(ordersByCustomer).length === 0 ? (
+            </div>          ) : Object.keys(salesByCustomer).length === 0 ? (
             <div className="text-center py-10">
               <ClipboardList className="mx-auto h-12 w-12 text-muted-foreground" />
               <h3 className="mt-4 text-lg font-semibold">No orders found</h3>
@@ -376,7 +240,7 @@ export function CustomerOrders() {
             </div>
           ) : (
             <Accordion type="single" collapsible className="w-full">
-              {Object.entries(ordersByCustomer).map(([customerId, customerOrders]) => {
+              {Object.entries(salesByCustomer).map(([customerId, customerSales]) => {
                 const customer = customers.find((c) => c.id.toString() === customerId)
                 if (!customer) return null
 
@@ -384,10 +248,9 @@ export function CustomerOrders() {
                   <AccordionItem key={customerId} value={customerId}>
                     <AccordionTrigger className="hover:bg-accent hover:text-accent-foreground px-4 rounded-md">
                       <div className="flex items-center gap-2">
-                        <User className="h-5 w-5" />
-                        <span>{customer.name}</span>
+                        <User className="h-5 w-5" />                        <span>{customer.name}</span>
                         <Badge variant="outline" className="ml-2">
-                          {customerOrders.length} orders
+                          {customerSales.length} orders
                         </Badge>
                       </div>
                     </AccordionTrigger>
@@ -400,27 +263,29 @@ export function CustomerOrders() {
                               <TableHead>Date</TableHead>
                               <TableHead>Items</TableHead>
                               <TableHead>Total</TableHead>
+                              <TableHead>Payment Method</TableHead>
                               <TableHead>Status</TableHead>
                               <TableHead>Served By</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {customerOrders.map((order) => (
-                              <TableRow key={order.id}>
-                                <TableCell className="font-medium">#{order.id}</TableCell>
-                                <TableCell>{new Date(order.date).toLocaleString()}</TableCell>
+                            {customerSales.map((sale) => (
+                              <TableRow key={sale.id}>
+                                <TableCell className="font-medium">#{sale.id}</TableCell>
+                                <TableCell>{new Date(sale.createdAt).toLocaleString()}</TableCell>
                                 <TableCell>
                                   <ul className="list-disc list-inside">
-                                    {order.items.map((item, index) => (
+                                    {sale.items.map((item, index) => (
                                       <li key={index}>
                                         {item.quantity}x {item.product.name}
                                       </li>
                                     ))}
                                   </ul>
                                 </TableCell>
-                                <TableCell>${order.total.toFixed(2)}</TableCell>
-                                <TableCell>{getStatusBadge(order.status)}</TableCell>
-                                <TableCell>{order.user.name}</TableCell>
+                                <TableCell>${sale.total.toLocaleString()}</TableCell>
+                                <TableCell>{sale.paymentMethod}</TableCell>
+                                <TableCell>{getStatusBadge()}</TableCell>
+                                <TableCell>{sale.user.name}</TableCell>
                               </TableRow>
                             ))}
                           </TableBody>
