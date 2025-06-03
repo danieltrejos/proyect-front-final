@@ -49,11 +49,11 @@ export function CustomersList() {
     phone: "",
   })
   useEffect(() => {
-    // Fetch customers from the backend API
+    // Fetch clientes del api del backend
     const fetchCustomers = async () => {
       try {
         setIsLoading(true)
-        console.log("🔄 Fetching customers from backend...")
+        console.log("Fetching customers from backend...")
 
         const response = await fetch('http://localhost:8000/api/v1/customers')
 
@@ -99,7 +99,7 @@ export function CustomersList() {
         return
       }
 
-      console.log("📤 Creating new customer:", formData)
+      console.log("Creating new customer:", formData)
 
       const response = await fetch('http://localhost:8000/api/v1/customers', {
         method: 'POST',
@@ -149,7 +149,7 @@ export function CustomersList() {
         return
       }
 
-      console.log("📤 Updating customer:", currentCustomer.id, formData)
+      console.log("Updating customer:", currentCustomer.id, formData)
 
       const response = await fetch(`http://localhost:8000/api/v1/customers/${currentCustomer.id}`, {
         method: 'PUT',

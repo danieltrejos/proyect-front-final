@@ -74,7 +74,7 @@ export function UsersList() {
         setIsLoading(false)
         toast({
           title: "Error",
-          description: "Failed to load users from server",
+          description: "Fallo al cargar los usuarios",
           variant: "destructive",
         })
       }
@@ -152,13 +152,13 @@ export function UsersList() {
 
       toast({
         title: "Success",
-        description: "User added successfully",
+        description: "Usuairio añadido correctamente",
       })
     } catch (error) {
       console.error("Failed to add user:", error)
       toast({
         title: "Error",
-        description: "Failed to add user",
+        description: "FAllo al añadir el usuario",
         variant: "destructive",
       })
     }
@@ -219,13 +219,13 @@ export function UsersList() {
 
       toast({
         title: "Success",
-        description: "User updated successfully",
+        description: "Usuario actualizado correctamente",
       })
     } catch (error) {
       console.error("Failed to update user:", error)
       toast({
         title: "Error",
-        description: "Failed to update user",
+        description: "Fallo al actualizar el usuario",
         variant: "destructive",
       })
     }
