@@ -5,9 +5,18 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Beer, ClipboardList, Home, LayoutDashboard, Menu, Package, ShoppingCart, Users, X } from "lucide-react"
+import { Beer, ClipboardList, Home, LayoutDashboard, Menu, Package, ShoppingCart, Users, X, User, Settings, LogOut, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Image from "next/image"
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -58,16 +67,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       icon: <Users className="h-5 w-5" />,
     },
   ]
-
   return (
     <div className="flex min-h-screen bg-background">
       {/* Mobile Navigation */}
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetTrigger asChild className="lg:hidden">
-          <Button variant="outline" size="icon" className="absolute left-4 top-4">
-            <Menu className="h-5 w-5" />
-          </Button>
-        </SheetTrigger>
         <SheetContent side="left" className="p-0 w-64">
           <div className="flex flex-col h-full">
             <div className="flex items-center justify-between p-4 border-b">
@@ -107,9 +110,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               alt="Metropolitan Logo"
               width={64}
               height={64}
-              className="hidden lg:block w-12 h-12 rounded-full"
+              className="hidden lg:block w-14 h-14 rounded-full"
             />
-            <h2 className="text-lg font-bold">Brewsy</h2>
+            <h2 className="text-2xl font-bold">Brewsy</h2>
           </div>
           <nav className="flex-1 p-4 space-y-2">
             {routes.map((route) => (
@@ -127,6 +130,63 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </div>
       </div>      {/* Main Content */}
       <div className="flex flex-col flex-1 lg:pl-64">
+        {/* Header */}
+        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="flex h-14 items-center px-4 md:px-6">
+            {/* Mobile menu button */}
+            <div className="lg:hidden">
+              <Sheet open={open} onOpenChange={setOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+              </Sheet>
+            </div>
+
+            {/* Spacer to push profile button to the right */}
+            <div className="flex-1" />
+
+            {/* Profile dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage src="/placeholder-user.jpg" alt="Usuario" />
+                    <AvatarFallback>U</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">Admin</p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      Admin@brewsy.com
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Perfil</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Configuración</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="http://localhost:3000/">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Cerrar sesión</span>
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </header>
+
         <main className="flex-1 p-4 md:p-6">{children}</main>
 
         {/* Footer */}
