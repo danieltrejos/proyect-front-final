@@ -12,7 +12,7 @@ export default function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSplash(false)
-    }, 6000) // Duración del splash-screen (5s + 1s de animación de salida)
+    }, 4000) // Duración del splash-screen (5s + 1s de animación de salida)
 
     return () => clearTimeout(timer)
   }, [])
@@ -22,8 +22,8 @@ export default function Home() {
       {showSplash ? (
         <SplashScreen
           duration={5000}
-          logoSrc="/logo_oficial.png" 
-          redirectPath="/products" 
+          logoSrc="/logo_oficial.png"
+          redirectPath="/products"
         />
       ) : (
         <DashboardLayout>
