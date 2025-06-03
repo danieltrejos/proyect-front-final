@@ -26,7 +26,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/hooks/use-toast"
 
 interface Product {
   id: number
@@ -308,7 +308,7 @@ export function ProductsList() {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              {/* --- MODIFICACIÓN: Títulos más genéricos si no son solo cervezas --- */}
+              {/* --- Títulos más genéricos --- */}
               <DialogTitle>Agrega un nuevo producto</DialogTitle>
               <DialogDescription>Añade un nuevo producto a tu inventario.</DialogDescription>
             </DialogHeader>
