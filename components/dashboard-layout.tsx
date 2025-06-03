@@ -15,7 +15,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   const routes = [
     /* {
-      href: "/dashboard",
+      href: "/overview",
       label: "Vista General",
       icon: <Home className="h-5 w-5" />,
     }, */
