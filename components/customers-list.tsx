@@ -32,9 +32,8 @@ interface Customer {
   name: string
   email: string
   phone: string
-  address: string
-  notes: string
   createdAt: string
+  updatedAt: string
 }
 
 export function CustomersList() {
@@ -48,73 +47,33 @@ export function CustomersList() {
     name: "",
     email: "",
     phone: "",
-    address: "",
-    notes: "",
   })
-
   useEffect(() => {
-    // Fetch customers from your API
+    // Fetch customers from the backend API
     const fetchCustomers = async () => {
       try {
-        // In a real app, you would fetch from your API
-        // const response = await fetch('http://localhost:8000/api/v1/customers')
-        // const data = await response.json()
+        setIsLoading(true)
+        console.log("🔄 Fetching customers from backend...")
 
-        // For demo purposes, using mock data
-        setTimeout(() => {
-          const mockCustomers: Customer[] = [
-            {
-              id: 1,
-              name: "John Doe",
-              email: "john.doe@example.com",
-              phone: "555-123-4567",
-              address: "123 Main St, Anytown, USA",
-              notes: "Regular customer, prefers IPAs",
-              createdAt: "2023-01-15T10:30:00",
-            },
-            {
-              id: 2,
-              name: "Jane Smith",
-              email: "jane.smith@example.com",
-              phone: "555-987-6543",
-              address: "456 Oak Ave, Somewhere, USA",
-              notes: "Visits on weekends, likes stouts",
-              createdAt: "2023-02-20T14:45:00",
-            },
-            {
-              id: 3,
-              name: "Robert Johnson",
-              email: "robert.johnson@example.com",
-              phone: "555-456-7890",
-              address: "789 Pine Rd, Nowhere, USA",
-              notes: "Member of the beer club, enjoys sour beers",
-              createdAt: "2023-03-10T18:15:00",
-            },
-            {
-              id: 4,
-              name: "Maria Rodriguez",
-              email: "maria.rodriguez@example.com",
-              phone: "555-789-0123",
-              address: "321 Elm St, Elsewhere, USA",
-              notes: "Frequent visitor, prefers wheat beers",
-              createdAt: "2023-03-25T20:30:00",
-            },
-            {
-              id: 5,
-              name: "David Wilson",
-              email: "david.wilson@example.com",
-              phone: "555-234-5678",
-              address: "654 Maple Dr, Anywhere, USA",
-              notes: "New customer, enjoys Belgian ales",
-              createdAt: "2023-04-05T19:45:00",
-            },
-          ]
-          setCustomers(mockCustomers)
-          setIsLoading(false)
-        }, 1000)
-      } catch (error) {
-        console.error("Failed to fetch customers:", error)
+        const response = await fetch('http://localhost:8000/api/v1/customers')
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const data = await response.json()
+        console.log("✅ Customers data received:", data)
+
+        setCustomers(data)
         setIsLoading(false)
+      } catch (error) {
+        console.error("❌ Failed to fetch customers:", error)
+        setIsLoading(false)
+        toast({
+          title: "Error",
+          description: "Failed to load customers from server",
+          variant: "destructive",
+        })
       }
     }
 
@@ -128,7 +87,6 @@ export function CustomersList() {
       [name]: value,
     })
   }
-
   const handleAddCustomer = async () => {
     try {
       // Validate form data
@@ -141,24 +99,20 @@ export function CustomersList() {
         return
       }
 
-      // In a real app, you would send to your API
-      // const response = await fetch('http://localhost:8000/api/v1/customers', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // })
-      // const data = await response.json()
+      console.log("📤 Creating new customer:", formData)
 
-      // For demo purposes, simulate adding to the list
-      const newCustomer: Customer = {
-        id: customers.length + 1,
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.address,
-        notes: formData.notes,
-        createdAt: new Date().toISOString(),
+      const response = await fetch('http://localhost:8000/api/v1/customers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
+
+      const newCustomer = await response.json()
+      console.log("✅ Customer created:", newCustomer)
 
       setCustomers([...customers, newCustomer])
       setIsAddDialogOpen(false)
@@ -166,8 +120,6 @@ export function CustomersList() {
         name: "",
         email: "",
         phone: "",
-        address: "",
-        notes: "",
       })
 
       toast({
@@ -175,7 +127,7 @@ export function CustomersList() {
         description: "Customer added successfully",
       })
     } catch (error) {
-      console.error("Failed to add customer:", error)
+      console.error("❌ Failed to add customer:", error)
       toast({
         title: "Error",
         description: "Failed to add customer",
@@ -183,7 +135,6 @@ export function CustomersList() {
       })
     }
   }
-
   const handleEditCustomer = async () => {
     if (!currentCustomer) return
 
@@ -198,25 +149,25 @@ export function CustomersList() {
         return
       }
 
-      // In a real app, you would send to your API
-      // const response = await fetch(`http://localhost:8000/api/v1/customers/${currentCustomer.id}`, {
-      //   method: 'PUT',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // })
-      // const data = await response.json()
+      console.log("📤 Updating customer:", currentCustomer.id, formData)
 
-      // For demo purposes, update the list
+      const response = await fetch(`http://localhost:8000/api/v1/customers/${currentCustomer.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const updatedCustomer = await response.json()
+      console.log("✅ Customer updated:", updatedCustomer)
+
+      // Update the local state
       const updatedCustomers = customers.map((customer) => {
         if (customer.id === currentCustomer.id) {
-          return {
-            ...customer,
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            address: formData.address,
-            notes: formData.notes,
-          }
+          return updatedCustomer
         }
         return customer
       })
@@ -230,7 +181,7 @@ export function CustomersList() {
         description: "Customer updated successfully",
       })
     } catch (error) {
-      console.error("Failed to update customer:", error)
+      console.error("❌ Failed to update customer:", error)
       toast({
         title: "Error",
         description: "Failed to update customer",
@@ -240,28 +191,12 @@ export function CustomersList() {
   }
 
   const handleDeleteCustomer = async (id: number) => {
-    try {
-      // In a real app, you would send to your API
-      // await fetch(`http://localhost:8000/api/v1/customers/${id}`, {
-      //   method: 'DELETE'
-      // })
-
-      // For demo purposes, update the list
-      const updatedCustomers = customers.filter((customer) => customer.id !== id)
-      setCustomers(updatedCustomers)
-
-      toast({
-        title: "Success",
-        description: "Customer deleted successfully",
-      })
-    } catch (error) {
-      console.error("Failed to delete customer:", error)
-      toast({
-        title: "Error",
-        description: "Failed to delete customer",
-        variant: "destructive",
-      })
-    }
+    // Delete functionality is disabled
+    toast({
+      title: "Information",
+      description: "Delete functionality is currently disabled",
+      variant: "default",
+    })
   }
 
   const openEditDialog = (customer: Customer) => {
@@ -270,10 +205,25 @@ export function CustomersList() {
       name: customer.name,
       email: customer.email,
       phone: customer.phone,
-      address: customer.address,
-      notes: customer.notes,
     })
     setIsEditDialogOpen(true)
+  }
+  const openAddDialog = () => {
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+    })
+    setIsAddDialogOpen(true)
+  }
+
+  const closeAddDialog = () => {
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+    })
+    setIsAddDialogOpen(false)
   }
 
   const filteredCustomers = customers.filter(
@@ -282,95 +232,69 @@ export function CustomersList() {
       customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.phone.includes(searchTerm),
   )
-
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Customer
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Customer</DialogTitle>
-              <DialogDescription>Add a new customer to your database.</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Name
-                </Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="email" className="text-right">
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="phone" className="text-right">
-                  Phone
-                </Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="address" className="text-right">
-                  Address
-                </Label>
-                <Input
-                  id="address"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="notes" className="text-right">
-                  Notes
-                </Label>
-                <Input
-                  id="notes"
-                  name="notes"
-                  value={formData.notes}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleAddCustomer}>Add Customer</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <Button onClick={openAddDialog}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Customer
+        </Button>
       </div>
+
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Customer</DialogTitle>
+            <DialogDescription>Add a new customer to your database.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Name
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                placeholder="Enter customer name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="email" className="text-right">
+                Email
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="Enter email address"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="phone" className="text-right">
+                Phone
+              </Label>                <Input
+                id="phone"
+                name="phone"
+                placeholder="Enter phone number"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={closeAddDialog}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddCustomer}>Add Customer</Button>            </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Card>
         <CardHeader>
@@ -396,61 +320,61 @@ export function CustomersList() {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
             </div>
           ) : (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
+            <div className="rounded-md border">              <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead className="hidden md:table-cell">Created At</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredCustomers.length === 0 ? (
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead className="hidden md:table-cell">Address</TableHead>
-                    <TableHead className="hidden md:table-cell">Notes</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableCell colSpan={5} className="text-center">
+                      No customers found
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredCustomers.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center">
-                        No customers found
+                ) : (
+                  filteredCustomers.map((customer) => (
+                    <TableRow key={customer.id}>
+                      <TableCell className="font-medium">{customer.name}</TableCell>
+                      <TableCell>{customer.email}</TableCell>
+                      <TableCell>{customer.phone}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {new Date(customer.createdAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Open menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>                              <DropdownMenuItem onClick={() => openEditDialog(customer)}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleDeleteCustomer(customer.id)}
+                              disabled
+                              className="text-muted-foreground"
+                            >
+                              <Trash className="mr-2 h-4 w-4" />
+                              Delete (Disabled)
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
-                  ) : (
-                    filteredCustomers.map((customer) => (
-                      <TableRow key={customer.id}>
-                        <TableCell className="font-medium">{customer.name}</TableCell>
-                        <TableCell>{customer.email}</TableCell>
-                        <TableCell>{customer.phone}</TableCell>
-                        <TableCell className="hidden md:table-cell">{customer.address}</TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {customer.notes.length > 30 ? `${customer.notes.substring(0, 30)}...` : customer.notes}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Open menu</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem onClick={() => openEditDialog(customer)}>
-                                <Edit className="mr-2 h-4 w-4" />
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleDeleteCustomer(customer.id)}>
-                                <Trash className="mr-2 h-4 w-4" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+                  ))
+                )}
+              </TableBody>
+            </Table>
             </div>
           )}
         </CardContent>
@@ -487,8 +411,7 @@ export function CustomersList() {
                 onChange={handleInputChange}
                 className="col-span-3"
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
+            </div>            <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-phone" className="text-right">
                 Phone
               </Label>
@@ -496,30 +419,6 @@ export function CustomersList() {
                 id="edit-phone"
                 name="phone"
                 value={formData.phone}
-                onChange={handleInputChange}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-address" className="text-right">
-                Address
-              </Label>
-              <Input
-                id="edit-address"
-                name="address"
-                value={formData.address}
-                onChange={handleInputChange}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-notes" className="text-right">
-                Notes
-              </Label>
-              <Input
-                id="edit-notes"
-                name="notes"
-                value={formData.notes}
                 onChange={handleInputChange}
                 className="col-span-3"
               />
