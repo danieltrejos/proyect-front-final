@@ -33,8 +33,8 @@ interface User {
   name: string
   email: string
   role: string
-  status: "active" | "inactive"
   createdAt: string
+  updatedAt: string
 }
 
 export function UsersList() {
@@ -51,65 +51,32 @@ export function UsersList() {
     password: "",
     confirmPassword: "",
   })
-
   useEffect(() => {
-    // Fetch users from your API
+    // Fetch users from the backend API
     const fetchUsers = async () => {
       try {
-        // In a real app, you would fetch from your API
-        // const response = await fetch('http://localhost:8000/api/v1/users')
-        // const data = await response.json()
+        setIsLoading(true)
+        console.log("🔄 Fetching users from backend...")
 
-        // For demo purposes, using mock data
-        setTimeout(() => {
-          const mockUsers: User[] = [
-            {
-              id: 1,
-              name: "Admin User",
-              email: "admin@rockbar.com",
-              role: "admin",
-              status: "active",
-              createdAt: "2023-01-01T10:00:00",
-            },
-            {
-              id: 2,
-              name: "Bartender 1",
-              email: "bartender1@rockbar.com",
-              role: "bartender",
-              status: "active",
-              createdAt: "2023-01-15T14:30:00",
-            },
-            {
-              id: 3,
-              name: "Bartender 2",
-              email: "bartender2@rockbar.com",
-              role: "bartender",
-              status: "active",
-              createdAt: "2023-02-10T09:15:00",
-            },
-            {
-              id: 4,
-              name: "Manager",
-              email: "manager@rockbar.com",
-              role: "manager",
-              status: "active",
-              createdAt: "2023-01-05T11:45:00",
-            },
-            {
-              id: 5,
-              name: "Former Employee",
-              email: "former@rockbar.com",
-              role: "bartender",
-              status: "inactive",
-              createdAt: "2022-11-20T16:30:00",
-            },
-          ]
-          setUsers(mockUsers)
-          setIsLoading(false)
-        }, 1000)
-      } catch (error) {
-        console.error("Failed to fetch users:", error)
+        const response = await fetch('http://localhost:8000/api/v1/users')
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const data = await response.json()
+        console.log("✅ Users data received:", data)
+
+        setUsers(data)
         setIsLoading(false)
+      } catch (error) {
+        console.error("❌ Failed to fetch users:", error)
+        setIsLoading(false)
+        toast({
+          title: "Error",
+          description: "Failed to load users from server",
+          variant: "destructive",
+        })
       }
     }
 
@@ -163,16 +130,14 @@ export function UsersList() {
       //     password: formData.password
       //   })
       // })
-      // const data = await response.json()
-
-      // For demo purposes, simulate adding to the list
+      // const data = await response.json()      // For demo purposes, simulate adding to the list
       const newUser: User = {
         id: users.length + 1,
         name: formData.name,
         email: formData.email,
         role: formData.role,
-        status: "active",
         createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       }
 
       setUsers([...users, newUser])
@@ -265,46 +230,6 @@ export function UsersList() {
       })
     }
   }
-
-  const handleToggleUserStatus = async (user: User) => {
-    try {
-      const newStatus = user.status === "active" ? "inactive" : "active"
-
-      // In a real app, you would send to your API
-      // const response = await fetch(`http://localhost:8000/api/v1/users/${user.id}/status`, {
-      //   method: 'PUT',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ status: newStatus })
-      // })
-      // const data = await response.json()
-
-      // For demo purposes, update the list
-      const updatedUsers = users.map((u) => {
-        if (u.id === user.id) {
-          return {
-            ...u,
-            status: newStatus as "active" | "inactive",
-          }
-        }
-        return u
-      })
-
-      setUsers(updatedUsers)
-
-      toast({
-        title: "Success",
-        description: `User ${newStatus === "active" ? "activated" : "deactivated"} successfully`,
-      })
-    } catch (error) {
-      console.error("Failed to toggle user status:", error)
-      toast({
-        title: "Error",
-        description: "Failed to update user status",
-        variant: "destructive",
-      })
-    }
-  }
-
   const openEditDialog = (user: User) => {
     setCurrentUser(user)
     setFormData({
@@ -316,13 +241,15 @@ export function UsersList() {
     })
     setIsEditDialogOpen(true)
   }
-
   const filteredUsers = users.filter(
     (user) =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.role.toLowerCase().includes(searchTerm.toLowerCase()),
   )
+
+  // Debug log for filtered results
+  console.log("🔍 Search term:", searchTerm, "| Filtered users:", filteredUsers.length, "of", users.length)
 
   return (
     <div className="flex flex-col gap-6">
@@ -443,13 +370,11 @@ export function UsersList() {
             </div>
           ) : (
             <div className="rounded-md border">
-              <Table>
-                <TableHeader>
+              <Table>                <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Role</TableHead>
-                    <TableHead>Status</TableHead>
                     <TableHead className="hidden md:table-cell">Created</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -457,7 +382,7 @@ export function UsersList() {
                 <TableBody>
                   {filteredUsers.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center">
+                      <TableCell colSpan={5} className="text-center">
                         No users found
                       </TableCell>
                     </TableRow>
@@ -467,15 +392,6 @@ export function UsersList() {
                         <TableCell className="font-medium">{user.name}</TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell className="capitalize">{user.role}</TableCell>
-                        <TableCell>
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs ${
-                              user.status === "active" ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"
-                            }`}
-                          >
-                            {user.status}
-                          </span>
-                        </TableCell>
                         <TableCell className="hidden md:table-cell">
                           {new Date(user.createdAt).toLocaleDateString()}
                         </TableCell>
@@ -492,19 +408,6 @@ export function UsersList() {
                               <DropdownMenuItem onClick={() => openEditDialog(user)}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleToggleUserStatus(user)}>
-                                {user.status === "active" ? (
-                                  <>
-                                    <Trash className="mr-2 h-4 w-4" />
-                                    Deactivate
-                                  </>
-                                ) : (
-                                  <>
-                                    <Edit className="mr-2 h-4 w-4" />
-                                    Activate
-                                  </>
-                                )}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
