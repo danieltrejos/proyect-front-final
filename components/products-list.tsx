@@ -324,7 +324,7 @@ export function ProductsList() {
               {/* Input Tipo */}
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="type" className="text-right">Tipo</Label>
-                <Input id="type" name="type" value={formData.type} onChange={handleInputChange} className="col-span-3" placeholder="Ej: Laptop, Cerveza, Ropa (opcional)" />
+                <Input id="type" name="type" value={formData.type} onChange={handleInputChange} className="col-span-3" placeholder="Ej: Lager, Ipa, Ale (opcional)" />
               </div>
 
               {/* Input Precio */}
