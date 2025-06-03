@@ -146,7 +146,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   <span className="text-xl font-bold text-white">Brewsy</span>
                 </div>
                 <p className="text-gray-400 text-sm">
-                  La solución SaaS para la gestión inteligente de inventarios de bebidas alcohólicas.
+                  La solución SaaS para la gestión inteligente de inventarios de bebidas.
                 </p>
               </div>
 
@@ -155,17 +155,17 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <h3 className="font-semibold text-white mb-4">Producto</h3>
                 <ul className="space-y-2 text-gray-400 text-sm">
                   <li>
-                    <Link href="/products" className="hover:text-white transition-colors">
+                    <Link href="/#" className="hover:text-white transition-colors">
                       Características
                     </Link>
                   </li>
                   <li>
-                    <Link href="/inventory" className="hover:text-white transition-colors">
+                    <Link href="/#" className="hover:text-white transition-colors">
                       Precios
                     </Link>
                   </li>
                   <li>
-                    <Link href="/pos" className="hover:text-white transition-colors">
+                    <Link href="/#" className="hover:text-white transition-colors">
                       Demo
                     </Link>
                   </li>
@@ -199,7 +199,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <h3 className="font-semibold text-white mb-4">Contacto</h3>
                 <ul className="space-y-2 text-gray-400 text-sm">
                   <li>soporte@brewsy.com</li>
-                  <li>+57 312 345 6789</li>
+                  <li>+57 3016651643</li>
                   <li>www.brewsy.com</li>
                 </ul>
               </div>

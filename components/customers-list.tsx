@@ -25,7 +25,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/hooks/use-toast"
 
 interface Customer {
   id: number
@@ -49,11 +49,11 @@ export function CustomersList() {
     phone: "",
   })
   useEffect(() => {
-    // Fetch customers from the backend API
+    // Fetch clientes del api del backend
     const fetchCustomers = async () => {
       try {
         setIsLoading(true)
-        console.log("🔄 Fetching customers from backend...")
+        console.log("Fetching customers from backend...")
 
         const response = await fetch('http://localhost:8000/api/v1/customers')
 
@@ -62,16 +62,16 @@ export function CustomersList() {
         }
 
         const data = await response.json()
-        console.log("✅ Customers data received:", data)
+        console.log("Customers data received:", data)
 
         setCustomers(data)
         setIsLoading(false)
       } catch (error) {
-        console.error("❌ Failed to fetch customers:", error)
+        console.error("Failed to fetch customers:", error)
         setIsLoading(false)
         toast({
           title: "Error",
-          description: "Failed to load customers from server",
+          description: "Fallo al cargar los clientes desde el servidor",
           variant: "destructive",
         })
       }
@@ -93,13 +93,13 @@ export function CustomersList() {
       if (!formData.name || !formData.email || !formData.phone) {
         toast({
           title: "Error",
-          description: "Please fill all required fields",
+          description: "Por favor, completa todos los campos requeridos",
           variant: "destructive",
         })
         return
       }
 
-      console.log("📤 Creating new customer:", formData)
+      console.log("Creating new customer:", formData)
 
       const response = await fetch('http://localhost:8000/api/v1/customers', {
         method: 'POST',
@@ -112,7 +112,7 @@ export function CustomersList() {
       }
 
       const newCustomer = await response.json()
-      console.log("✅ Customer created:", newCustomer)
+      console.log("Customer created:", newCustomer)
 
       setCustomers([...customers, newCustomer])
       setIsAddDialogOpen(false)
@@ -124,13 +124,13 @@ export function CustomersList() {
 
       toast({
         title: "Success",
-        description: "Customer added successfully",
+        description: "Cliente añadido correctamente",
       })
     } catch (error) {
-      console.error("❌ Failed to add customer:", error)
+      console.error("Failed to add customer:", error)
       toast({
         title: "Error",
-        description: "Failed to add customer",
+        description: "Fallo al añadir el cliente",
         variant: "destructive",
       })
     }
@@ -143,13 +143,13 @@ export function CustomersList() {
       if (!formData.name || !formData.email || !formData.phone) {
         toast({
           title: "Error",
-          description: "Please fill all required fields",
+          description: "Por favor, completa todos los campos requeridos",
           variant: "destructive",
         })
         return
       }
 
-      console.log("📤 Updating customer:", currentCustomer.id, formData)
+      console.log("Updating customer:", currentCustomer.id, formData)
 
       const response = await fetch(`http://localhost:8000/api/v1/customers/${currentCustomer.id}`, {
         method: 'PUT',
@@ -178,13 +178,13 @@ export function CustomersList() {
 
       toast({
         title: "Success",
-        description: "Customer updated successfully",
+        description: "Cliente actualizado satisfactoriamente",
       })
     } catch (error) {
-      console.error("❌ Failed to update customer:", error)
+      console.error("Failed to update customer:", error)
       toast({
         title: "Error",
-        description: "Failed to update customer",
+        description: "Fallo al actualizar el cliente",
         variant: "destructive",
       })
     }
@@ -194,7 +194,7 @@ export function CustomersList() {
     // Delete functionality is disabled
     toast({
       title: "Information",
-      description: "Delete functionality is currently disabled",
+      description: "La función eliminar esta actualmente deshabilitada",
       variant: "default",
     })
   }

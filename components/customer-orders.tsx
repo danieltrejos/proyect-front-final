@@ -12,7 +12,7 @@ import { format } from "date-fns"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/hooks/use-toast"
 
 interface Sale {
   id: number
@@ -111,7 +111,7 @@ export function CustomerOrders() {
         setIsLoading(false)
         toast({
           title: "Error",
-          description: "Failed to load orders and customers from server",
+          description: "Fallo al cargar los perdidos y clientes desde el servidor",
           variant: "destructive",
         })
       }

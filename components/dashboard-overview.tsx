@@ -20,7 +20,7 @@ export function DashboardOverview() {
     // Simulate fetching data from your API
     const fetchData = async () => {
       try {
-        // In a real app, you would fetch from your API
+
         // const response = await fetch('http://localhost:8000/api/v1/stats')
         // const data = await response.json()
 

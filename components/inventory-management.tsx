@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/hooks/use-toast"
 
 interface Product {
   id: number
@@ -39,12 +39,7 @@ export function InventoryManagement() {
 
   useEffect(() => {
     // Fetch products from your API
-    /* const fetchProducts = async () => {
-      try {
-        // In a real app, you would fetch from your API
-        // const response = await fetch('http://localhost:8000/api/v1/products')
-        // const data = await response.json()
-
+    /* 
         // For demo purposes, using mock data
         setTimeout(() => {
           const mockProducts: Product[] = [
