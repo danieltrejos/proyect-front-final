@@ -83,23 +83,23 @@ export function PosSystem() {
                     throw new Error(`Error HTTP al obtener productos: ${productsResponse.status}`);
                 }
 
-                const productsData = await productsResponse.json();                console.log("Datos de productos obtenidos:", productsData);
+                const productsData = await productsResponse.json(); console.log("Datos de productos obtenidos:", productsData);
                 setProducts(productsData);
 
                 // Obtener clientes desde el backend
                 console.log("Cargando clientes desde:", "http://localhost:8000/api/v1/customers");
                 const customersResponse = await fetch("http://localhost:8000/api/v1/customers");
-                
+
                 if (!customersResponse.ok) {
                     throw new Error(`Error HTTP al obtener clientes: ${customersResponse.status}`);
-                }                const customersData = await customersResponse.json();
+                } const customersData = await customersResponse.json();
                 console.log("Datos de clientes obtenidos:", customersData);
                 setCustomers(customersData);
 
                 // Obtener usuarios desde el backend
                 console.log("Cargando usuarios desde:", "http://localhost:8000/api/v1/users");
                 const usersResponse = await fetch("http://localhost:8000/api/v1/users");
-                
+
                 if (!usersResponse.ok) {
                     throw new Error(`Error HTTP al obtener usuarios: ${usersResponse.status}`);
                 }
@@ -107,7 +107,7 @@ export function PosSystem() {
                 const usersData = await usersResponse.json();
                 console.log("Datos de usuarios obtenidos:", usersData);
                 setUsers(usersData);
-                  // Seleccionar el primer usuario por defecto
+                // Seleccionar el primer usuario por defecto
                 if (usersData.length > 0) {
                     setSelectedUser(usersData[0].id.toString());
                 }
@@ -226,7 +226,7 @@ export function PosSystem() {
                 total,
                 paymentAmount: amount,
                 change: change,
-                paymentMethod: "Cash", // Default payment method
+                paymentMethod: "Efectivo", // Default payment method
                 customerId: selectedCustomer ? parseInt(selectedCustomer) : undefined,
                 userId: parseInt(selectedUser)
             };
@@ -413,7 +413,7 @@ export function PosSystem() {
                                     </Button>
                                 )}
                             </div>
-                            <CardDescription>No items en la orden</CardDescription>
+                            <CardDescription>No hay artículo en la orden</CardDescription>
                         </CardHeader>
                         <CardContent className="p-0">
                             {cart.length === 0 ? (
