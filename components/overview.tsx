@@ -4,52 +4,52 @@ import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 
 const data = [
   {
-    name: "Jan",
-    total: 1200,
+    name: "Ene",
+    total: 1200000,
   },
   {
     name: "Feb",
-    total: 1900,
+    total: 1900000,
   },
   {
     name: "Mar",
-    total: 2300,
+    total: 2300000,
   },
   {
-    name: "Apr",
-    total: 2800,
+    name: "Abr",
+    total: 2800000,
   },
   {
     name: "May",
-    total: 3500,
+    total: 3500000,
   },
   {
     name: "Jun",
-    total: 4200,
+    total: 4200000,
   },
   {
     name: "Jul",
-    total: 4800,
+    total: 4800000,
   },
   {
-    name: "Aug",
-    total: 5200,
+    name: "Ago",
+    total: 5200000,
   },
   {
     name: "Sep",
-    total: 4700,
+    total: 4700000,
   },
   {
     name: "Oct",
-    total: 4300,
+    total: 4300000,
   },
   {
     name: "Nov",
-    total: 3900,
+    total: 3900000,
   },
   {
-    name: "Dec",
-    total: 4320,
+    name: "Dic",
+    total: 4320000,
   },
 ]
 
