@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Beer, ClipboardList, Home, LayoutDashboard, Menu, Package, ShoppingCart, Users, X, User, Settings, LogOut, ChevronDown } from "lucide-react"
+import { Beer, ClipboardList, Home, LayoutDashboard, Menu, Package, ShoppingCart, Users, X, User, Settings, LogOut, ChevronDown, Building2, DollarSign, Calculator } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import {
@@ -22,12 +22,14 @@ import Image from "next/image"
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const [configurationOpen, setConfigurationOpen] = useState(false)
+
   const routes = [
-    /* {
+    {
       href: "/overview",
       label: "Vista General",
       icon: <Home className="h-5 w-5" />,
-    }, */
+    }, 
     {
       href: "/products",
       label: "Productos",
@@ -63,8 +65,29 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     },
     {
       href: "/users",
-      label: "Users",
+      label: "Usuarios",
       icon: <Users className="h-5 w-5" />,
+    },
+  ]
+
+  // Configuración submenu
+  const configurationRoutes = [
+    {
+      href: "/configuration/company",
+      label: "Perfil de la empresa",
+      icon: <Building2 className="h-4 w-4" />,
+    },
+    {
+      href: "/configuration/currencies",
+      label: "Monedas",
+      icon: <DollarSign className="h-4 w-4" />,
+      disabled: true, // Por ahora deshabilitado
+    },
+    {
+      href: "/configuration/taxes",
+      label: "Impuestos",
+      icon: <Calculator className="h-4 w-4" />,
+      disabled: true, // Por ahora deshabilitado
     },
   ]
   return (
@@ -79,8 +102,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <h2 className="text-lg font-bold">Brewsy</h2>
               </div>
 
-            </div>
-            <nav className="flex-1 p-4 space-y-2">
+            </div>            <nav className="flex-1 p-4 space-y-2">
               {routes.map((route) => (
                 <Link
                   key={route.href}
@@ -93,6 +115,41 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   {route.label}
                 </Link>
               ))}
+
+              {/* Configuración Dropdown - Mobile */}
+              <div className="space-y-1">
+                <button
+                  onClick={() => setConfigurationOpen(!configurationOpen)}
+                  className={`flex items-center justify-between w-full gap-3 px-3 py-2 rounded-md text-sm transition-colors hover:bg-accent/50 ${pathname.startsWith('/configuration') ? "bg-accent text-accent-foreground" : ""}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Settings className="h-5 w-5" />
+                    Configuración
+                  </div>
+                  <ChevronDown className={`h-4 w-4 transition-transform ${configurationOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {configurationOpen && (
+                  <div className="ml-6 space-y-1">
+                    {configurationRoutes.map((route) => (
+                      <Link
+                        key={route.href}
+                        href={route.disabled ? "#" : route.href}
+                        onClick={() => !route.disabled && setOpen(false)}
+                        className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${route.disabled
+                          ? "opacity-50 cursor-not-allowed"
+                          : pathname === route.href
+                            ? "bg-accent text-accent-foreground"
+                            : "hover:bg-accent/50"
+                          }`}
+                      >
+                        {route.icon}
+                        {route.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             </nav>
           </div>
         </SheetContent>
@@ -111,8 +168,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               className="hidden lg:block w-14 h-14 rounded-full"
             />
             <h2 className="text-2xl font-bold">Brewsy</h2>
-          </div>
-          <nav className="flex-1 p-4 space-y-2">
+          </div>          <nav className="flex-1 p-4 space-y-2">
             {routes.map((route) => (
               <Link
                 key={route.href}
@@ -124,6 +180,40 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 {route.label}
               </Link>
             ))}
+
+            {/* Configuración Dropdown - Desktop */}
+            <div className="space-y-1">
+              <button
+                onClick={() => setConfigurationOpen(!configurationOpen)}
+                className={`flex items-center justify-between w-full gap-3 px-3 py-2 rounded-md text-sm transition-colors hover:bg-accent/50 ${pathname.startsWith('/configuration') ? "bg-accent text-accent-foreground" : ""}`}
+              >
+                <div className="flex items-center gap-3">
+                  <Settings className="h-5 w-5" />
+                  Configuración
+                </div>
+                <ChevronDown className={`h-4 w-4 transition-transform ${configurationOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {configurationOpen && (
+                <div className="ml-6 space-y-1">
+                  {configurationRoutes.map((route) => (
+                    <Link
+                      key={route.href}
+                      href={route.disabled ? "#" : route.href}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${route.disabled
+                        ? "opacity-50 cursor-not-allowed"
+                        : pathname === route.href
+                          ? "bg-accent text-accent-foreground"
+                          : "hover:bg-accent/50"
+                        }`}
+                    >
+                      {route.icon}
+                      {route.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </nav>
         </div>
       </div>      {/* Main Content */}
