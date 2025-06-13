@@ -76,18 +76,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       href: "/configuration/company",
       label: "Perfil de la empresa",
       icon: <Building2 className="h-4 w-4" />,
-    },
-    {
+    },    {
       href: "/configuration/currencies",
       label: "Monedas",
       icon: <DollarSign className="h-4 w-4" />,
-      disabled: true, // Por ahora deshabilitado
     },
     {
       href: "/configuration/taxes",
       label: "Impuestos",
       icon: <Calculator className="h-4 w-4" />,
-      disabled: true, // Por ahora deshabilitado
     },
   ]
   return (
@@ -130,18 +127,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 </button>
 
                 {configurationOpen && (
-                  <div className="ml-6 space-y-1">
-                    {configurationRoutes.map((route) => (
+                  <div className="ml-6 space-y-1">                    {configurationRoutes.map((route) => (
                       <Link
                         key={route.href}
-                        href={route.disabled ? "#" : route.href}
-                        onClick={() => !route.disabled && setOpen(false)}
-                        className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${route.disabled
-                          ? "opacity-50 cursor-not-allowed"
-                          : pathname === route.href
+                        href={route.href}
+                        onClick={() => setOpen(false)}
+                        className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+                          pathname === route.href
                             ? "bg-accent text-accent-foreground"
                             : "hover:bg-accent/50"
-                          }`}
+                        }`}
                       >
                         {route.icon}
                         {route.label}
@@ -195,17 +190,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               </button>
 
               {configurationOpen && (
-                <div className="ml-6 space-y-1">
-                  {configurationRoutes.map((route) => (
+                <div className="ml-6 space-y-1">                  {configurationRoutes.map((route) => (
                     <Link
                       key={route.href}
-                      href={route.disabled ? "#" : route.href}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${route.disabled
-                        ? "opacity-50 cursor-not-allowed"
-                        : pathname === route.href
+                      href={route.href}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+                        pathname === route.href
                           ? "bg-accent text-accent-foreground"
                           : "hover:bg-accent/50"
-                        }`}
+                      }`}
                     >
                       {route.icon}
                       {route.label}
