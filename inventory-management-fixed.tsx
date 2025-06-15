@@ -48,7 +48,7 @@ export function InventoryManagement() {
         setIsLoading(true)
         try {
             console.log("Obteniendo productos desde:", API_URL)
-            const response = await fetch(API_URL)
+            const response = await fetch(`${API_URL}?all=true`)
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`)
             }

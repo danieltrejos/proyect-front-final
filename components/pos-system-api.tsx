@@ -116,17 +116,16 @@ export function PosSystem() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setIsLoading(true);
-
-                // Obtener productos desde la API
+                setIsLoading(true);                // Obtener productos desde la API (todos, sin paginación para POS)
                 console.log("Obteniendo productos desde:", API_URL);
-                const productsResponse = await fetch(API_URL);
+                const productsResponse = await fetch(`${API_URL}?all=true`);
 
                 if (!productsResponse.ok) {
                     throw new Error(`Error HTTP al obtener productos: ${productsResponse.status}`);
                 }
 
-                const productsData = await productsResponse.json(); console.log("Datos de productos obtenidos:", productsData);
+                const productsData = await productsResponse.json();
+                console.log("Datos de productos obtenidos:", productsData);
                 setProducts(productsData);
 
                 // Obtener clientes desde el backend
