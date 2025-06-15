@@ -125,7 +125,7 @@ export function SalesHistory() {
           setUsers(usersData)
         } else {
           console.warn("⚠️ Could not fetch users:", usersResponse.status)
-        }        console.log("🎉 Sales history data loaded successfully")
+        } console.log("🎉 Sales history data loaded successfully")
       } catch (error) {
         console.error("❌ Error loading sales history:", error)
         // Fallback to empty array on error
@@ -368,28 +368,28 @@ export function SalesHistory() {
                         No se encontró registro de ventas
                       </TableCell>
                     </TableRow>
-                  ) : (paginatedSales.map((sale) => (                    <TableRow key={sale.id}>
-                      <TableCell className="font-medium">{sale.id}</TableCell>
-                      <TableCell>{new Date(sale.createdAt).toLocaleString()}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <User className="h-4 w-4 text-muted-foreground" />
-                          {sale.customer?.name || 'Cliente no especificado'}
-                        </div>
-                      </TableCell>
-                      <TableCell>{sale.user?.name || 'Usuario no especificado'}</TableCell>
-                      <TableCell>
-                        <ul className="list-disc list-inside">
-                          {sale.items?.map((item, index) => (
-                            <li key={index}>
-                              {item.quantity}x {item.product?.name || 'Producto'}
-                            </li>
-                          )) || 'Sin items'}
-                        </ul>
-                      </TableCell>
-                      <TableCell className="text-right">${sale.total.toFixed(2)}</TableCell>
-                      <TableCell>{sale.paymentMethod}</TableCell>
-                    </TableRow>
+                  ) : (paginatedSales.map((sale) => (<TableRow key={sale.id}>
+                    <TableCell className="font-medium">{sale.id}</TableCell>
+                    <TableCell>{new Date(sale.createdAt).toLocaleString()}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        {sale.customer?.name || 'Cliente no especificado'}
+                      </div>
+                    </TableCell>
+                    <TableCell>{sale.user?.name || 'Usuario no especificado'}</TableCell>
+                    <TableCell>
+                      <ul className="list-disc list-inside">
+                        {sale.items?.map((item, index) => (
+                          <li key={index}>
+                            {item.quantity}x {item.product?.name || 'Producto'}
+                          </li>
+                        )) || 'Sin items'}
+                      </ul>
+                    </TableCell>
+                    <TableCell className="text-right">${sale.total.toFixed(2)}</TableCell>
+                    <TableCell>{sale.paymentMethod}</TableCell>
+                  </TableRow>
                   ))
                   )}
                 </TableBody>              </Table>
