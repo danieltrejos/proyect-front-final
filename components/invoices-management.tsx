@@ -121,9 +121,7 @@ export function InvoicesManagement() {
             if (customersResponse.ok) {
                 const customersData = await customersResponse.json()
                 setCustomers(customersData)
-            }
-
-            // Cargar usuarios
+            }            // Cargar usuarios
             const usersResponse = await fetch(`${API_BASE_URL}/users`)
             if (usersResponse.ok) {
                 const usersData = await usersResponse.json()
@@ -159,16 +157,32 @@ export function InvoicesManagement() {
                 queryParams.append('endDate', filters.endDate)
             }
 
-            const response = await fetch(`${API_BASE_URL}/invoices?${queryParams.toString()}`)
+            const url = `${API_BASE_URL}/invoices?${queryParams.toString()}`
+            console.log('Fetching invoices from:', url) // Debug log
+            console.log('Filters being sent:', filters) // Debug log
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+
+            console.log('Response status:', response.status) // Debug log
+            console.log('Response headers:', [...response.headers.entries()]) // Debug log
 
             if (!response.ok) {
-                throw new Error(`Error HTTP: ${response.status}`)
+                const errorText = await response.text()
+                console.error('Error response text:', errorText) // Debug log
+                throw new Error(`Error HTTP: ${response.status} - ${errorText}`)
             }
 
             const data: InvoiceResponse = await response.json()
-            setInvoices(data.invoices)
-            setTotalPages(data.totalPages)
-            setTotalInvoices(data.total)
+            console.log('Response data:', data) // Debug log
+
+            setInvoices(data.invoices || [])
+            setTotalPages(data.totalPages || 0)
+            setTotalInvoices(data.total || 0)
 
         } catch (error) {
             console.error("Error al obtener facturas:", error)
@@ -206,7 +220,8 @@ export function InvoicesManagement() {
             })
         } catch (error) {
             console.error("Error al descargar factura:", error)
-            toast({                title: "Error",
+            toast({
+                title: "Error",
                 description: "No se pudo descargar la factura",
                 variant: "destructive",
             })
@@ -219,9 +234,16 @@ export function InvoicesManagement() {
     }
 
     const handleFilterChange = (key: keyof InvoiceFilters, value: string | number | undefined) => {
+        let processedValue = value;
+
+        // Si es "all", convertir a undefined para no enviarlo al backend
+        if (value === "all") {
+            processedValue = undefined;
+        }
+
         setFilters(prev => ({
             ...prev,
-            [key]: value,
+            [key]: processedValue,
             page: key !== 'page' ? 1 : (typeof value === 'number' ? value : 1) // Reset page when filters change
         }))
     }
@@ -229,7 +251,12 @@ export function InvoicesManagement() {
     const clearFilters = () => {
         setFilters({
             page: 1,
-            limit: 10
+            limit: 10,
+            customerId: undefined,
+            userId: undefined,
+            invoiceNumber: undefined,
+            startDate: undefined,
+            endDate: undefined
         })
     }
 
@@ -276,23 +303,21 @@ export function InvoicesManagement() {
                             <Label htmlFor="invoiceNumber">Número de Factura</Label>
                             <Input
                                 id="invoiceNumber"
-                                placeholder="Ej: INV-001"
+                                placeholder="Ej: FAC-00001"
                                 value={filters.invoiceNumber || ''}
                                 onChange={(e) => handleFilterChange('invoiceNumber', e.target.value)}
                             />
-                        </div>
-
-                        <div className="space-y-2">
+                        </div>                        <div className="space-y-2">
                             <Label htmlFor="customer">Cliente</Label>
                             <Select
-                                value={filters.customerId || ''}
-                                onValueChange={(value) => handleFilterChange('customerId', value || undefined)}
+                                value={filters.customerId || 'all'}
+                                onValueChange={(value) => handleFilterChange('customerId', value === 'all' ? undefined : value)}
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Todos los clientes" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">Todos los clientes</SelectItem>
+                                    <SelectItem value="all">Todos los clientes</SelectItem>
                                     {customers.map((customer) => (
                                         <SelectItem key={customer.id} value={customer.id.toString()}>
                                             {customer.name}
@@ -300,19 +325,17 @@ export function InvoicesManagement() {
                                     ))}
                                 </SelectContent>
                             </Select>
-                        </div>
-
-                        <div className="space-y-2">
+                        </div>                        <div className="space-y-2">
                             <Label htmlFor="user">Usuario</Label>
                             <Select
-                                value={filters.userId || ''}
-                                onValueChange={(value) => handleFilterChange('userId', value || undefined)}
+                                value={filters.userId || 'all'}
+                                onValueChange={(value) => handleFilterChange('userId', value === 'all' ? undefined : value)}
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Todos los usuarios" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">Todos los usuarios</SelectItem>
+                                    <SelectItem value="all">Todos los usuarios</SelectItem>
                                     {users.map((user) => (
                                         <SelectItem key={user.id} value={user.id.toString()}>
                                             {user.name}

@@ -106,7 +106,8 @@ export function CustomerOrders() {
         setSales(salesData)
         setCustomers(customersData)
         setIsLoading(false)
-      } catch (error) {        console.error("Failed to fetch data:", error)
+      } catch (error) {
+        console.error("Failed to fetch data:", error)
         setIsLoading(false)
         toast({
           title: "Error",
@@ -136,7 +137,8 @@ export function CustomerOrders() {
     // Filter by status - we can add this logic later if needed
     const statusMatch = statusFilter === "all" || statusFilter === "completed"
 
-    return searchMatch && dateMatch && customerMatch && statusMatch  })
+    return searchMatch && dateMatch && customerMatch && statusMatch
+  })
 
   // Group sales by customer
   const salesByCustomer = filteredSales.reduce<Record<string, Sale[]>>((acc, sale) => {
@@ -246,12 +248,12 @@ export function CustomerOrders() {
                 return (
                   <AccordionItem key={customerId} value={customerId}>
                     <AccordionTrigger className="hover:bg-accent hover:text-accent-foreground px-4 rounded-md">                      <div className="flex items-center gap-2">
-                        <User className="h-5 w-5" />
-                        <span>{customer.name || `Cliente ${customerId}`}</span>
-                        <Badge variant="outline" className="ml-2">
-                          {customerSales.length} pedidos
-                        </Badge>
-                      </div>
+                      <User className="h-5 w-5" />
+                      <span>{customer.name || `Cliente ${customerId}`}</span>
+                      <Badge variant="outline" className="ml-2">
+                        {customerSales.length} pedidos
+                      </Badge>
+                    </div>
                     </AccordionTrigger>
                     <AccordionContent>
                       <div className="rounded-md border mt-2">
