@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Beer, ClipboardList, Home, LayoutDashboard, Menu, Package, ShoppingCart, Users, X, User, Settings, LogOut, ChevronDown, Building2, DollarSign, Calculator } from "lucide-react"
+import { Beer, ClipboardList, Home, LayoutDashboard, Menu, Package, ShoppingCart, Users, X, User, Settings, LogOut, ChevronDown, Building2, DollarSign, Calculator, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import {
@@ -23,13 +23,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [configurationOpen, setConfigurationOpen] = useState(false)
-
   const routes = [
     {
       href: "/overview",
       label: "Vista General",
       icon: <Home className="h-5 w-5" />,
-    }, 
+    },
     {
       href: "/products",
       label: "Productos",
@@ -50,6 +49,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       href: "/sales-history",
       label: "Historial de ventas",
       icon: <ClipboardList className="h-5 w-5" />,
+    },
+
+    {
+      href: "/invoices",
+      label: "Facturas",
+      icon: <FileText className="h-5 w-5" />,
     },
 
     {
@@ -76,7 +81,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       href: "/configuration/company",
       label: "Perfil de la empresa",
       icon: <Building2 className="h-4 w-4" />,
-    },    {
+    }, {
       href: "/configuration/currencies",
       label: "Monedas",
       icon: <DollarSign className="h-4 w-4" />,
@@ -128,20 +133,19 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
                 {configurationOpen && (
                   <div className="ml-6 space-y-1">                    {configurationRoutes.map((route) => (
-                      <Link
-                        key={route.href}
-                        href={route.href}
-                        onClick={() => setOpen(false)}
-                        className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                          pathname === route.href
-                            ? "bg-accent text-accent-foreground"
-                            : "hover:bg-accent/50"
+                    <Link
+                      key={route.href}
+                      href={route.href}
+                      onClick={() => setOpen(false)}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${pathname === route.href
+                          ? "bg-accent text-accent-foreground"
+                          : "hover:bg-accent/50"
                         }`}
-                      >
-                        {route.icon}
-                        {route.label}
-                      </Link>
-                    ))}
+                    >
+                      {route.icon}
+                      {route.label}
+                    </Link>
+                  ))}
                   </div>
                 )}
               </div>
@@ -191,19 +195,18 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
               {configurationOpen && (
                 <div className="ml-6 space-y-1">                  {configurationRoutes.map((route) => (
-                    <Link
-                      key={route.href}
-                      href={route.href}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                        pathname === route.href
-                          ? "bg-accent text-accent-foreground"
-                          : "hover:bg-accent/50"
+                  <Link
+                    key={route.href}
+                    href={route.href}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${pathname === route.href
+                        ? "bg-accent text-accent-foreground"
+                        : "hover:bg-accent/50"
                       }`}
-                    >
-                      {route.icon}
-                      {route.label}
-                    </Link>
-                  ))}
+                  >
+                    {route.icon}
+                    {route.label}
+                  </Link>
+                ))}
                 </div>
               )}
             </div>
