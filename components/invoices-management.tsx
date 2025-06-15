@@ -198,33 +198,55 @@ export function InvoicesManagement() {
 
     const downloadInvoice = async (saleId: number, invoiceNumber: string) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/invoices/${saleId}/download`)
+            console.log(`Downloading invoice for sale ID: ${saleId}, invoice: ${invoiceNumber}`)
 
-            if (!response.ok) {
-                throw new Error(`Error al descargar factura: ${response.status}`)
-            }
+            // Abrir directamente la URL en una nueva ventana para evitar bloqueos
+            const downloadUrl = `${API_BASE_URL}/invoices/${saleId}/download`
 
-            const blob = await response.blob()
-            const url = window.URL.createObjectURL(blob)
+            // Crear un enlace temporal y hacer clic en él
             const link = document.createElement('a')
-            link.href = url
+            link.href = downloadUrl
             link.download = `factura-${invoiceNumber}.pdf`
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
-            window.URL.revokeObjectURL(url)
+            link.target = '_blank'
+            link.rel = 'noopener noreferrer'
 
-            toast({
-                title: "Éxito",
-                description: `Factura ${invoiceNumber} descargada correctamente`,
-            })
+            // Agregar temporalmente al DOM
+            document.body.appendChild(link)
+
+            // Hacer clic programáticamente
+            link.click()
+
+            // Remover del DOM
+            document.body.removeChild(link)
+
+            // Mostrar mensaje de éxito después de un breve delay
+            setTimeout(() => {
+                toast({
+                    title: "Descarga iniciada",
+                    description: `Factura ${invoiceNumber} se está descargando`,
+                })
+            }, 500)
+
         } catch (error) {
             console.error("Error al descargar factura:", error)
-            toast({
-                title: "Error",
-                description: "No se pudo descargar la factura",
-                variant: "destructive",
-            })
+
+            // Como fallback, intentar abrir en nueva pestaña
+            try {
+                const fallbackUrl = `${API_BASE_URL}/invoices/${saleId}/download`
+                window.open(fallbackUrl, '_blank')
+
+                toast({
+                    title: "Descarga alternativa",
+                    description: `Se abrió la factura ${invoiceNumber} en una nueva pestaña`,
+                })
+            } catch (fallbackError) {
+                console.error("Error en descarga alternativa:", fallbackError)
+                toast({
+                    title: "Error",
+                    description: "No se pudo descargar la factura. Intenta deshabilitar el bloqueador de anuncios.",
+                    variant: "destructive",
+                })
+            }
         }
     }
 
