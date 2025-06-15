@@ -125,9 +125,7 @@ export function SalesHistory() {
           setUsers(usersData)
         } else {
           console.warn("⚠️ Could not fetch users:", usersResponse.status)
-        }
-
-        console.log("🎉 Sales history data loaded successfully")
+        } console.log("🎉 Sales history data loaded successfully")
       } catch (error) {
         console.error("❌ Error loading sales history:", error)
         // Fallback to empty array on error
@@ -139,12 +137,13 @@ export function SalesHistory() {
 
     fetchSalesHistory()
   }, [])
+
   const filteredSales = sales.filter((sale) => {
     // Filter by search term
     const searchMatch =
       sale.id.toString().includes(searchTerm) ||
-      sale.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      sale.items.some((item) => item.product.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      (sale.customer?.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      sale.items?.some((item) => item.product?.name?.toLowerCase().includes(searchTerm.toLowerCase())) || false
 
     // Filter by single date (legacy support)
     const dateMatch = dateFilter ? new Date(sale.createdAt).toDateString() === dateFilter.toDateString() : true
@@ -192,15 +191,14 @@ export function SalesHistory() {
     setCurrentPage(1)
   }
 
-  const exportToCSV = () => {
-    // Create CSV content - export ALL filtered sales, not just current page
+  const exportToCSV = () => {    // Create CSV content - export ALL filtered sales, not just current page
     const headers = ["ID", "Date", "Customer", "User", "Items", "Total", "Payment Method"]
     const rows = filteredSales.map((sale) => [
       sale.id,
       new Date(sale.createdAt).toLocaleString(),
-      sale.customer.name,
-      sale.user.name,
-      sale.items.map((item) => `${item.quantity}x ${item.product.name}`).join(", "),
+      sale.customer?.name || 'Cliente no especificado',
+      sale.user?.name || 'Usuario no especificado',
+      sale.items?.map((item) => `${item.quantity}x ${item.product?.name || 'Producto'}`).join(", ") || 'Sin items',
       `$${sale.total.toFixed(2)}`,
       sale.paymentMethod,
     ])
@@ -314,12 +312,11 @@ export function SalesHistory() {
               <Select value={customerFilter} onValueChange={setCustomerFilter}>
                 <SelectTrigger>
                   <SelectValue placeholder="Filtrar por cliente" />
-                </SelectTrigger>
-                <SelectContent>
+                </SelectTrigger>                <SelectContent>
                   <SelectItem value="all">Todos los clientes</SelectItem>
                   {customers.map((customer) => (
                     <SelectItem key={customer.id} value={customer.id.toString()}>
-                      {customer.name}
+                      {customer.name || `Cliente ${customer.id}`}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -333,7 +330,7 @@ export function SalesHistory() {
                   <SelectItem value="all">Todos los usuarios</SelectItem>
                   {users.map((user) => (
                     <SelectItem key={user.id} value={user.id.toString()}>
-                      {user.name}
+                      {user.name || `Usuario ${user.id}`}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -371,28 +368,28 @@ export function SalesHistory() {
                         No se encontró registro de ventas
                       </TableCell>
                     </TableRow>
-                  ) : (paginatedSales.map((sale) => (
-                    <TableRow key={sale.id}>
-                      <TableCell className="font-medium">{sale.id}</TableCell>
-                      <TableCell>{new Date(sale.createdAt).toLocaleString()}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <User className="h-4 w-4 text-muted-foreground" />
-                          {sale.customer.name}
-                        </div>
-                      </TableCell>
-                      <TableCell>{sale.user.name}</TableCell>                        <TableCell>
-                        <ul className="list-disc list-inside">
-                          {sale.items.map((item, index) => (
-                            <li key={index}>
-                              {item.quantity}x {item.product.name}
-                            </li>
-                          ))}
-                        </ul>
-                      </TableCell>
-                      <TableCell className="text-right">${sale.total.toFixed(2)}</TableCell>
-                      <TableCell>{sale.paymentMethod}</TableCell>
-                    </TableRow>
+                  ) : (paginatedSales.map((sale) => (<TableRow key={sale.id}>
+                    <TableCell className="font-medium">{sale.id}</TableCell>
+                    <TableCell>{new Date(sale.createdAt).toLocaleString()}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        {sale.customer?.name || 'Cliente no especificado'}
+                      </div>
+                    </TableCell>
+                    <TableCell>{sale.user?.name || 'Usuario no especificado'}</TableCell>
+                    <TableCell>
+                      <ul className="list-disc list-inside">
+                        {sale.items?.map((item, index) => (
+                          <li key={index}>
+                            {item.quantity}x {item.product?.name || 'Producto'}
+                          </li>
+                        )) || 'Sin items'}
+                      </ul>
+                    </TableCell>
+                    <TableCell className="text-right">${sale.total.toFixed(2)}</TableCell>
+                    <TableCell>{sale.paymentMethod}</TableCell>
+                  </TableRow>
                   ))
                   )}
                 </TableBody>              </Table>

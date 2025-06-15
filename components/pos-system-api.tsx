@@ -82,6 +82,16 @@ interface Company {
     updatedAt: string
 }
 
+interface SaleResponse {
+    id: number
+    total: number
+    subtotal: number
+    taxAmount: number
+    taxRate: number
+    invoiceNumber: string
+    [key: string]: any
+}
+
 export function PosSystem() {
     const [products, setProducts] = useState<Product[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -95,7 +105,10 @@ export function PosSystem() {
     const [selectedUser, setSelectedUser] = useState<string>("")
     const [searchTerm, setSearchTerm] = useState("")
     const [defaultTax, setDefaultTax] = useState<Tax | null>(null)
-    const [company, setCompany] = useState<Company | null>(null)
+    const [company, setCompany] = useState<Company | null>(null)    // Estados para manejo de facturas
+    const [lastSale, setLastSale] = useState<SaleResponse | null>(null)
+    const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false)
+    const [isDownloadingInvoice, setIsDownloadingInvoice] = useState(false)
 
     // URL del API de productos
     const API_URL = "http://localhost:8000/api/v1/products"
@@ -251,6 +264,43 @@ export function PosSystem() {
 
     const getTotalWithTax = () => {
         return getCartTotal() + getTaxAmount()
+    }        // Función para descargar la factura en PDF
+    const downloadInvoice = async (saleId: number, invoiceNumber: string) => {
+        try {
+            setIsDownloadingInvoice(true)
+
+            const downloadUrl = `http://localhost:8000/api/v1/invoices/${saleId}/download`
+
+            // Método directo: crear enlace y hacer click
+            const link = document.createElement('a')
+            link.href = downloadUrl
+            link.download = `factura-${invoiceNumber}.pdf`
+            link.target = '_blank'
+            link.style.display = 'none'
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+
+            // Mostrar mensaje de éxito inmediatamente
+            toast({
+                title: "Descarga Iniciada",
+                description: `La descarga de la factura ${invoiceNumber} ha comenzado`,
+            })
+
+            // Cerrar el modal
+            setIsInvoiceModalOpen(false)
+            setLastSale(null)
+
+        } catch (error) {
+            console.error("Error al descargar factura:", error)
+            toast({
+                title: "Error",
+                description: "No se pudo iniciar la descarga. Intenta nuevamente.",
+                variant: "destructive",
+            })
+        } finally {
+            setIsDownloadingInvoice(false)
+        }
     }
 
     const handleCheckout = async () => {
@@ -273,7 +323,7 @@ export function PosSystem() {
                     variant: "destructive",
                 })
                 return
-            }            const total = getTotalWithTax()
+            } const total = getTotalWithTax()
 
             if (amount < total) {
                 toast({
@@ -284,13 +334,13 @@ export function PosSystem() {
                 return
             }// Preparar datos para la venta
             const change = amount - total;
-            
+
             // Calcular subtotal e impuestos
             const subtotal = total;
             const taxRate = defaultTax?.rate || 0;
             const taxAmount = subtotal * (taxRate / 100);
             const totalWithTax = subtotal + taxAmount;
-            
+
             // Verificar que tenemos la información necesaria
             if (!company) {
                 toast({
@@ -300,7 +350,7 @@ export function PosSystem() {
                 })
                 return
             }
-            
+
             const saleData = {
                 items: cart.map(item => ({
                     productId: item.product.id,
@@ -331,9 +381,14 @@ export function PosSystem() {
                 console.error(`Error HTTP ${response.status}:`, errorText);
                 throw new Error(`Error HTTP: ${response.status} - ${errorText}`)
             }
-
             const saleResponse = await response.json()
-            console.log("Venta creada exitosamente:", saleResponse)            // Actualizar el stock de productos
+            console.log("Venta creada exitosamente:", saleResponse)
+
+            // Guardar datos de la venta para la factura
+            setLastSale(saleResponse)
+            setIsInvoiceModalOpen(true) // Abrir modal en lugar de mostrar card
+
+            // Actualizar el stock de productos
             const updatedProducts = products.map((product) => {
                 const cartItem = cart.find((item) => item.product.id === product.id)
                 if (cartItem) {
@@ -357,7 +412,7 @@ export function PosSystem() {
 
             toast({
                 title: "Éxito",
-                description: `Venta completada para ${customerName}. Cambio: $${(amount - (subtotal + taxAmount)).toFixed(2)}`,
+                description: `Venta completada para ${customerName}. Cambio: $${(amount - (subtotal + taxAmount)).toFixed(2)}. Factura: ${saleResponse.invoiceNumber}`,
             })
         } catch (error) {
             console.error("Error al procesar la venta:", error)
@@ -607,12 +662,55 @@ export function PosSystem() {
                                         <Receipt className="mr-2 h-4 w-4" />
                                         Checkout
                                     </Button>
-                                </CardFooter>
-                            </>
-                        )}
-                    </Card>
-                </div>
-            </div>
+                                </CardFooter>                            </>
+                        )}                    </Card>
+                </div>            </div>
+
+            {/* Modal de Factura Generada */}
+            <Dialog open={isInvoiceModalOpen} onOpenChange={setIsInvoiceModalOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-green-600">
+                            <Receipt className="h-5 w-5" />
+                            ¡Venta Exitosa!
+                        </DialogTitle>
+                        <DialogDescription>
+                            {lastSale && (
+                                <>
+                                    Se ha generado la factura N° <strong>{lastSale.invoiceNumber}</strong>
+                                    <br />
+                                    Total: <strong>${lastSale.total.toFixed(2)}</strong>
+                                </>
+                            )}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="flex flex-col gap-3 py-4">
+                        <Button
+                            className="w-full"
+                            variant="default"
+                            onClick={() => lastSale && downloadInvoice(lastSale.id, lastSale.invoiceNumber)}
+                            disabled={isDownloadingInvoice}
+                        >
+                            <Receipt className="mr-2 h-4 w-4" />
+                            {isDownloadingInvoice ? "Generando PDF..." : "Descargar Factura PDF"}
+                        </Button>
+                    </div>
+
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => {
+                                setIsInvoiceModalOpen(false)
+                                setLastSale(null)
+                            }}
+                        >
+                            Cerrar y Continuar
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             <Dialog open={isCheckoutDialogOpen} onOpenChange={setIsCheckoutDialogOpen}>
                 <DialogContent>
