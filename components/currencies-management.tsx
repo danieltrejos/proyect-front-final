@@ -264,7 +264,7 @@ export function CurrenciesManagement() {
   // Activar/Desactivar currency
   const toggleCurrencyStatus = async (currency: Currency) => {
     try {
-      const endpoint = currency.isActive 
+      const endpoint = currency.isActive
         ? `${API_URL}/${currency.id}/deactivate`
         : `${API_URL}/${currency.id}/activate`
 
@@ -448,65 +448,65 @@ export function CurrenciesManagement() {
         </CardHeader>
         <CardContent>
           <Table>            <TableHeader>
-              <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Código</TableHead>
-                <TableHead>Símbolo</TableHead>
-                <TableHead>Precisión</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Fecha Creación</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
+            <TableRow>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Código</TableHead>
+              <TableHead>Símbolo</TableHead>
+              <TableHead>Precisión</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Fecha Creación</TableHead>
+              <TableHead className="text-right">Acciones</TableHead>
+            </TableRow>
+          </TableHeader>
             <TableBody>
-              {currencies.map((currency) => (                <TableRow key={currency.id}>
-                  <TableCell className="font-medium">{currency.name}</TableCell>
-                  <TableCell>{currency.code}</TableCell>
-                  <TableCell>{currency.symbol}</TableCell>
-                  <TableCell>{currency.precision}</TableCell>
-                  <TableCell>
-                    <Badge variant={currency.isActive ? "default" : "secondary"}>
-                      {currency.isActive ? "Activa" : "Inactiva"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {new Date(currency.createdAt).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Abrir menú</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => prepareEdit(currency)}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => toggleCurrencyStatus(currency)}
-                        >
-                          {currency.isActive ? (
-                            <XCircle className="mr-2 h-4 w-4" />
-                          ) : (
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                          )}
-                          {currency.isActive ? "Desactivar" : "Activar"}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => prepareDelete(currency)}
-                          className="text-red-600"
-                        >
-                          <Trash className="mr-2 h-4 w-4" />
-                          Eliminar
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
+              {currencies.map((currency) => (<TableRow key={currency.id}>
+                <TableCell className="font-medium">{currency.name}</TableCell>
+                <TableCell>{currency.code}</TableCell>
+                <TableCell>{currency.symbol}</TableCell>
+                <TableCell>{currency.precision}</TableCell>
+                <TableCell>
+                  <Badge variant={currency.isActive ? "default" : "secondary"}>
+                    {currency.isActive ? "Activa" : "Inactiva"}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {new Date(currency.createdAt).toLocaleDateString()}
+                </TableCell>
+                <TableCell className="text-right">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Abrir menú</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                      <DropdownMenuItem onClick={() => prepareEdit(currency)}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        Editar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => toggleCurrencyStatus(currency)}
+                      >
+                        {currency.isActive ? (
+                          <XCircle className="mr-2 h-4 w-4" />
+                        ) : (
+                          <CheckCircle className="mr-2 h-4 w-4" />
+                        )}
+                        {currency.isActive ? "Desactivar" : "Activar"}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => prepareDelete(currency)}
+                        className="text-red-600"
+                      >
+                        <Trash className="mr-2 h-4 w-4" />
+                        Eliminar
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
               ))}              {currencies.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center text-muted-foreground">
