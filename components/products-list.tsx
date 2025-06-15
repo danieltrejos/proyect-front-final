@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useEffect, useState } from "react"
-import { Edit, MoreHorizontal, Plus, Trash } from "lucide-react"
+import { Edit, MoreHorizontal, Plus, Trash, Search, X, Filter } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -22,6 +22,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -40,6 +47,24 @@ interface Product {
   updatedAt?: string
 }
 
+interface ProductFilters {
+  page: number
+  limit: number
+  name?: string
+  type?: string
+  minPrice?: number
+  maxPrice?: number
+  isActive?: boolean
+}
+
+interface ProductResponse {
+  products: Product[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
 // URL base de la API
 const API_URL = "http://localhost:8000/api/v1/products"
 
@@ -49,6 +74,15 @@ export function ProductsList() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null)
+
+  // Estado de paginación y filtros
+  const [filters, setFilters] = useState<ProductFilters>({
+    page: 1,
+    limit: 10
+  })
+  const [totalProducts, setTotalProducts] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
+  const [showFilters, setShowFilters] = useState(false)
 
 
   // Estado inicial del formulario (strings para los inputs)
@@ -63,18 +97,45 @@ export function ProductsList() {
     image: ""
   }
   const [formData, setFormData] = useState(initialFormData)
-
   const fetchProducts = async () => {
-    setIsLoading(true) // Indicar carga al inicio
+    setIsLoading(true)
     try {
-      const response = await fetch(API_URL)
+      // Construir query parameters
+      const queryParams = new URLSearchParams()
+      queryParams.append('page', filters.page.toString())
+      queryParams.append('limit', filters.limit.toString())
+
+      if (filters.name) {
+        queryParams.append('name', filters.name)
+      }
+      if (filters.type && filters.type !== 'all') {
+        queryParams.append('type', filters.type)
+      }
+      if (filters.minPrice !== undefined) {
+        queryParams.append('minPrice', filters.minPrice.toString())
+      }
+      if (filters.maxPrice !== undefined) {
+        queryParams.append('maxPrice', filters.maxPrice.toString())
+      }
+      if (filters.isActive !== undefined) {
+        queryParams.append('isActive', filters.isActive.toString())
+      }
+
+      const url = `${API_URL}?${queryParams.toString()}`
+      console.log('Fetching products from:', url)
+
+      const response = await fetch(url)
       if (!response.ok) {
-        // Si la respuesta no es OK, lanzar un error
         throw new Error(`HTTP error! status: ${response.status}`)
       }
-      const data: Product[] = await response.json() // Especificar el tipo esperado
+
+      const data: ProductResponse = await response.json()
       console.log("Datos recibidos de la API:", data)
-      setProducts(data)
+
+      setProducts(data.products)
+      setTotalProducts(data.total)
+      setTotalPages(data.totalPages)
+
     } catch (error) {
       console.error("Fallo al cargar productos:", error)
       toast({
@@ -82,18 +143,63 @@ export function ProductsList() {
         description: "No se pudieron cargar los productos desde la API.",
         variant: "destructive",
       })
-      // Opcional: mantener la lista vacía o con datos antiguos si falla
       setProducts([])
     } finally {
-      // Quitar el indicador de carga independientemente del resultado
       setIsLoading(false)
     }
   }
-
   // Usar fetchProducts en useEffect 
   useEffect(() => {
     fetchProducts()
-  }, [])// El array vacío [] asegura que esto se ejecute solo una vez al montar el componente
+  }, [filters]) // Se ejecuta cuando cambian los filtros
+
+  // Manejo de cambios en filtros
+  const handleFilterChange = (key: keyof ProductFilters, value: string | number | boolean | undefined) => {
+    let processedValue = value
+
+    // Si es "all", convertir a undefined para no enviarlo al backend
+    if (value === "all") {
+      processedValue = undefined
+    }
+
+    setFilters(prev => ({
+      ...prev,
+      [key]: processedValue,
+      page: key !== 'page' ? 1 : (typeof value === 'number' ? value : 1) // Reset page when filters change
+    }))
+  }
+
+  // Limpiar filtros
+  const clearFilters = () => {
+    setFilters({
+      page: 1,
+      limit: 10,
+      name: undefined,
+      type: undefined,
+      minPrice: undefined,
+      maxPrice: undefined,
+      isActive: undefined
+    })
+  }
+
+  // Navegación de páginas
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      handleFilterChange('page', page)
+    }
+  }
+
+  const goToPreviousPage = () => {
+    if (filters.page > 1) {
+      goToPage(filters.page - 1)
+    }
+  }
+
+  const goToNextPage = () => {
+    if (filters.page < totalPages) {
+      goToPage(filters.page + 1)
+    }
+  }
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -274,95 +380,204 @@ export function ProductsList() {
       })
     }
   }
-
   //! --- MODIFICACIÓN: Ajustar openEditDialog para manejar tipo null ---
   const openEditDialog = (product: Product) => {
     setCurrentProduct(product)
     setFormData({
       name: product.name,
       // Si el tipo es null, poner cadena vacía en el input, sino, el valor
-      type: product.type,
+      type: product.type ?? "",
       price: product.price.toString(), // Convertir a string para el input
       stock: product.stock.toString(), // Convertir a string para el input
       description: product.description,
       // Opcional: image: product.image || ""
+      image: product.image ?? ""
     })
     setIsEditDialogOpen(true)
   }
-
   return (
     <div className="flex flex-col gap-6">
       {/* Botón Agregar Producto y su Dialog */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Productos</h1>
-        <Dialog open={isAddDialogOpen} onOpenChange={(isOpen) => {
-          setIsAddDialogOpen(isOpen);
-          if (!isOpen) setFormData(initialFormData); // Limpiar form al cerrar
-        }}>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <Filter className="mr-2 h-4 w-4" />
+            {showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
+          </Button>
+          <Dialog open={isAddDialogOpen} onOpenChange={(isOpen) => {
+            setIsAddDialogOpen(isOpen);
+            if (!isOpen) setFormData(initialFormData); // Limpiar form al cerrar
+          }}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Agregar producto
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                {/* --- Títulos más genéricos --- */}
+                <DialogTitle>Agrega un nuevo producto</DialogTitle>
+                <DialogDescription>Añade un nuevo producto a tu inventario.</DialogDescription>
+              </DialogHeader>
 
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Agregar producto
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              {/* --- Títulos más genéricos --- */}
-              <DialogTitle>Agrega un nuevo producto</DialogTitle>
-              <DialogDescription>Añade un nuevo producto a tu inventario.</DialogDescription>
-            </DialogHeader>
+              {/* Formulario de Añadir (asegúrate que los 'name' coincidan con formData) */}
+              <div className="grid gap-4 py-4">
+                {/* Input Nombre */}
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">Nombre</Label>
+                  <Input id="name" name="name" value={formData.name} onChange={handleInputChange} className="col-span-3" />
+                </div>
 
-            {/* Formulario de Añadir (asegúrate que los 'name' coincidan con formData) */}
-            <div className="grid gap-4 py-4">
-              {/* Input Nombre */}
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">Nombre</Label>
-                <Input id="name" name="name" value={formData.name} onChange={handleInputChange} className="col-span-3" />
+                {/* Input Tipo */}
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="type" className="text-right">Tipo</Label>
+                  <Input id="type" name="type" value={formData.type} onChange={handleInputChange} className="col-span-3" placeholder="Ej: Lager, Ipa, Ale (opcional)" />
+                </div>
+
+                {/* Input Precio */}
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="price" className="text-right">Precio</Label>
+                  <Input id="price" name="price" type="number" step="0.01" min="0" value={formData.price} onChange={handleInputChange} className="col-span-3" />
+                </div>
+
+                {/* Input Stock */}
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="stock" className="text-right">Stock</Label>
+                  <Input id="stock" name="stock" type="number" step="1" min="0" value={formData.stock} onChange={handleInputChange} className="col-span-3" />
+                </div>
+
+                {/* Input URL-image */}
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="image" className="text-right">URL Imagen</Label>
+                  <Input id="image" name="image" value={formData.image} onChange={handleInputChange} className="col-span-3" />
+                </div>
+
+                {/* Input Descripción */}
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="description" className="text-right">Descripción</Label>
+                  <Textarea id="description" name="description" value={formData.description} onChange={handleInputChange} className="col-span-3" />
+                </div>
+                {/* Opcional: Input para Imagen si se gestiona */}
+                {/* <div className="grid grid-cols-4 items-center gap-4">
+                   <Label htmlFor="image" className="text-right">URL Imagen</Label>
+                   <Input id="image" name="image" value={formData.image} onChange={handleInputChange} className="col-span-3" />
+                 </div> */}
               </div>
-
-              {/* Input Tipo */}
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="type" className="text-right">Tipo</Label>
-                <Input id="type" name="type" value={formData.type} onChange={handleInputChange} className="col-span-3" placeholder="Ej: Lager, Ipa, Ale (opcional)" />
-              </div>
-
-              {/* Input Precio */}
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="price" className="text-right">Precio</Label>
-                <Input id="price" name="price" type="number" step="0.01" min="0" value={formData.price} onChange={handleInputChange} className="col-span-3" />
-              </div>
-
-              {/* Input Stock */}
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="stock" className="text-right">Stock</Label>
-                <Input id="stock" name="stock" type="number" step="1" min="0" value={formData.stock} onChange={handleInputChange} className="col-span-3" />
-              </div>
-
-              {/* Input URL-image */}
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="image" className="text-right">URL Imagen</Label>
-                <Input id="image" name="image" value={formData.image} onChange={handleInputChange} className="col-span-3" />
-              </div>
-
-              {/* Input Descripción */}
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="description" className="text-right">Descripción</Label>
-                <Textarea id="description" name="description" value={formData.description} onChange={handleInputChange} className="col-span-3" />
-              </div>
-              {/* Opcional: Input para Imagen si se gestiona */}
-              {/* <div className="grid grid-cols-4 items-center gap-4">
-                 <Label htmlFor="image" className="text-right">URL Imagen</Label>
-                 <Input id="image" name="image" value={formData.image} onChange={handleInputChange} className="col-span-3" />
-               </div> */}
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => { setIsAddDialogOpen(false); setFormData(initialFormData); }}>Cancelar</Button>
-              <Button onClick={handleAddProduct}>Agregar producto</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => { setIsAddDialogOpen(false); setFormData(initialFormData); }}>Cancelar</Button>
+                <Button onClick={handleAddProduct}>Agregar producto</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
+
+      {/* Panel de Filtros */}
+      {showFilters && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Filtros</CardTitle>
+            <CardDescription>Filtrar productos por diferentes criterios</CardDescription>
+          </CardHeader>
+          <CardContent>            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {/* Filtro de nombre */}
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="filter-name">Nombre</Label>
+              <Input
+                id="filter-name"
+                placeholder="Buscar por nombre..."
+                value={filters.name || ''}
+                onChange={(e) => handleFilterChange('name', e.target.value || undefined)}
+              />
+            </div>
+
+            {/* Filtro de tipo */}
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="filter-type">Tipo</Label>
+              <Select
+                value={filters.type || 'all'}
+                onValueChange={(value) => handleFilterChange('type', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los tipos</SelectItem>
+                  <SelectItem value="Lager">Lager</SelectItem>
+                  <SelectItem value="IPA">IPA</SelectItem>
+                  <SelectItem value="Ale">Ale</SelectItem>
+                  <SelectItem value="Stout">Stout</SelectItem>
+                  <SelectItem value="Pilsner">Pilsner</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Filtro de precio mínimo */}
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="filter-min-price">Precio mínimo</Label>
+              <Input
+                id="filter-min-price"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                value={filters.minPrice || ''}
+                onChange={(e) => handleFilterChange('minPrice', e.target.value ? Number(e.target.value) : undefined)}
+              />
+            </div>
+
+            {/* Filtro de precio máximo */}
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="filter-max-price">Precio máximo</Label>
+              <Input
+                id="filter-max-price"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="999.99"
+                value={filters.maxPrice || ''}
+                onChange={(e) => handleFilterChange('maxPrice', e.target.value ? Number(e.target.value) : undefined)}
+              />
+            </div>
+
+            {/* Elementos por página */}
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="filter-limit">Por página</Label>
+              <Select
+                value={filters.limit.toString()}
+                onValueChange={(value) => handleFilterChange('limit', Number(value))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5 productos</SelectItem>
+                  <SelectItem value="10">10 productos</SelectItem>
+                  <SelectItem value="20">20 productos</SelectItem>
+                  <SelectItem value="50">50 productos</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+            {/* Botones de acción de filtros */}
+            <div className="flex items-center gap-2 mt-4">
+              <Button variant="outline" onClick={clearFilters}>
+                <X className="mr-2 h-4 w-4" />
+                Limpiar filtros
+              </Button>
+              <div className="text-sm text-muted-foreground">
+                Mostrando {products.length} de {totalProducts} productos
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Tabla de Productos */}
       <Card>
@@ -442,9 +657,66 @@ export function ProductsList() {
                   ))
                 )}
               </TableBody>
-            </Table>
-          )}
+            </Table>)}
         </CardContent>
+
+        {/* Controles de paginación */}
+        {!isLoading && totalPages > 1 && (
+          <CardContent className="pt-0">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">
+                Página {filters.page} de {totalPages} ({totalProducts} productos en total)
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={goToPreviousPage}
+                  disabled={filters.page <= 1}
+                >
+                  Anterior
+                </Button>
+
+                <div className="flex items-center space-x-1">
+                  {/* Mostrar páginas cercanas */}
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum: number
+                    if (totalPages <= 5) {
+                      pageNum = i + 1
+                    } else if (filters.page <= 3) {
+                      pageNum = i + 1
+                    } else if (filters.page >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i
+                    } else {
+                      pageNum = filters.page - 2 + i
+                    }
+
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={filters.page === pageNum ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => goToPage(pageNum)}
+                      >
+                        {pageNum}
+                      </Button>
+                    )
+                  })}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={goToNextPage}
+                  disabled={filters.page >= totalPages}
+                >
+                  Siguiente
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        )}
       </Card>
 
       {/* Dialog para Editar Producto (sin cambios estructurales grandes aquí) */}
@@ -485,12 +757,10 @@ export function ProductsList() {
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-stock" className="text-right">Stock</Label>
               <Input id="edit-stock" name="stock" type="number" step="1" min="0" value={formData.stock} onChange={handleInputChange} className="col-span-3" />
-            </div>
-
-            {/* Input URL-image */}
+            </div>            {/* Input URL de imagen */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-type" className="text-right">URL imagen</Label>
-              <Input id="edit-type" name="type" value={formData.type} onChange={handleInputChange} className="col-span-3" placeholder="Ej: Laptop, Cerveza (opcional)" />
+              <Label htmlFor="edit-image" className="text-right">URL imagen</Label>
+              <Input id="edit-image" name="image" value={formData.image} onChange={handleInputChange} className="col-span-3" placeholder="URL de la imagen del producto" />
             </div>
 
             {/* Input Descripción */}
