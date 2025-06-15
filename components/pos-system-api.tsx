@@ -54,6 +54,34 @@ interface User {
     updatedAt?: string
 }
 
+interface Tax {
+    id: number
+    name: string
+    rate: number
+    isActive: boolean
+    isDefault: boolean
+    createdAt: string
+    updatedAt: string
+}
+
+interface Company {
+    id: string
+    name: string
+    registrationNumber: string
+    email: string
+    phone?: string
+    currency: string
+    timezone: string
+    logo?: string
+    street: string
+    city: string
+    state: string
+    postalCode: string
+    country: string
+    createdAt: string
+    updatedAt: string
+}
+
 export function PosSystem() {
     const [products, setProducts] = useState<Product[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -66,6 +94,8 @@ export function PosSystem() {
     const [selectedCustomer, setSelectedCustomer] = useState<string>("")
     const [selectedUser, setSelectedUser] = useState<string>("")
     const [searchTerm, setSearchTerm] = useState("")
+    const [defaultTax, setDefaultTax] = useState<Tax | null>(null)
+    const [company, setCompany] = useState<Company | null>(null)
 
     // URL del API de productos
     const API_URL = "http://localhost:8000/api/v1/products"
@@ -94,9 +124,7 @@ export function PosSystem() {
                     throw new Error(`Error HTTP al obtener clientes: ${customersResponse.status}`);
                 } const customersData = await customersResponse.json();
                 console.log("Datos de clientes obtenidos:", customersData);
-                setCustomers(customersData);
-
-                // Obtener usuarios desde el backend
+                setCustomers(customersData);                // Obtener usuarios desde el backend
                 console.log("Cargando usuarios desde:", "http://localhost:8000/api/v1/users");
                 const usersResponse = await fetch("http://localhost:8000/api/v1/users");
 
@@ -110,6 +138,37 @@ export function PosSystem() {
                 // Seleccionar el primer usuario por defecto
                 if (usersData.length > 0) {
                     setSelectedUser(usersData[0].id.toString());
+                }
+
+                // Obtener impuesto por defecto
+                console.log("Cargando impuesto por defecto desde:", "http://localhost:8000/api/v1/taxes");
+                try {
+                    const taxesResponse = await fetch("http://localhost:8000/api/v1/taxes");
+                    if (taxesResponse.ok) {
+                        const taxesData = await taxesResponse.json();
+                        const defaultTaxFound = taxesData.find((tax: Tax) => tax.isDefault && tax.isActive);
+                        if (defaultTaxFound) {
+                            setDefaultTax(defaultTaxFound);
+                            console.log("Impuesto por defecto encontrado:", defaultTaxFound);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error al obtener impuesto por defecto:", error);
+                }
+
+                // Obtener información de la empresa
+                console.log("Cargando empresa desde:", "http://localhost:8000/api/v1/companies");
+                try {
+                    const companiesResponse = await fetch("http://localhost:8000/api/v1/companies");
+                    if (companiesResponse.ok) {
+                        const companiesData = await companiesResponse.json();
+                        if (companiesData.length > 0) {
+                            setCompany(companiesData[0]);
+                            console.log("Empresa encontrada:", companiesData[0]);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error al obtener empresa:", error);
                 }
 
             } catch (error) {
@@ -184,6 +243,16 @@ export function PosSystem() {
         return cart.reduce((total, item) => total + item.product.price * item.quantity, 0)
     }
 
+    const getTaxAmount = () => {
+        const subtotal = getCartTotal()
+        const taxRate = defaultTax?.rate || 0
+        return subtotal * (taxRate / 100)
+    }
+
+    const getTotalWithTax = () => {
+        return getCartTotal() + getTaxAmount()
+    }
+
     const handleCheckout = async () => {
         try {
             if (!selectedUser) {
@@ -204,9 +273,7 @@ export function PosSystem() {
                     variant: "destructive",
                 })
                 return
-            }
-
-            const total = getCartTotal()
+            }            const total = getTotalWithTax()
 
             if (amount < total) {
                 toast({
@@ -215,20 +282,41 @@ export function PosSystem() {
                     variant: "destructive",
                 })
                 return
-            }            // Preparar datos para la venta
+            }// Preparar datos para la venta
             const change = amount - total;
+            
+            // Calcular subtotal e impuestos
+            const subtotal = total;
+            const taxRate = defaultTax?.rate || 0;
+            const taxAmount = subtotal * (taxRate / 100);
+            const totalWithTax = subtotal + taxAmount;
+            
+            // Verificar que tenemos la información necesaria
+            if (!company) {
+                toast({
+                    title: "Error",
+                    description: "No se pudo obtener la información de la empresa",
+                    variant: "destructive",
+                })
+                return
+            }
+            
             const saleData = {
                 items: cart.map(item => ({
                     productId: item.product.id,
                     quantity: item.quantity,
                     price: item.product.price
                 })),
-                total,
+                subtotal,
+                taxAmount,
+                taxRate,
+                total: totalWithTax,
                 paymentAmount: amount,
-                change: change,
+                change: amount - totalWithTax,
                 paymentMethod: "Efectivo", // Default payment method
                 customerId: selectedCustomer ? parseInt(selectedCustomer) : undefined,
-                userId: parseInt(selectedUser)
+                userId: parseInt(selectedUser),
+                companyId: company.id
             };
 
             console.log("Enviando datos de venta:", saleData);// Crear la venta en el backend
@@ -245,9 +333,7 @@ export function PosSystem() {
             }
 
             const saleResponse = await response.json()
-            console.log("Venta creada exitosamente:", saleResponse)
-
-            // Actualizar el stock de productos
+            console.log("Venta creada exitosamente:", saleResponse)            // Actualizar el stock de productos
             const updatedProducts = products.map((product) => {
                 const cartItem = cart.find((item) => item.product.id === product.id)
                 if (cartItem) {
@@ -271,7 +357,7 @@ export function PosSystem() {
 
             toast({
                 title: "Éxito",
-                description: `Venta completada para ${customerName}. Cambio: $${(amount - total).toFixed(2)}`,
+                description: `Venta completada para ${customerName}. Cambio: $${(amount - (subtotal + taxAmount)).toFixed(2)}`,
             })
         } catch (error) {
             console.error("Error al procesar la venta:", error)
@@ -453,15 +539,20 @@ export function PosSystem() {
                         </CardContent>
                         {cart.length > 0 && (
                             <>
-                                <Separator />
-                                <CardContent className="p-4">
+                                <Separator />                                <CardContent className="p-4">
                                     <div className="flex justify-between text-sm mb-2">
                                         <span>Subtotal</span>
                                         <span>${getCartTotal().toFixed(2)}</span>
                                     </div>
+                                    {defaultTax && defaultTax.rate > 0 && (
+                                        <div className="flex justify-between text-sm mb-2">
+                                            <span>Impuesto ({defaultTax.name} - {defaultTax.rate}%)</span>
+                                            <span>${getTaxAmount().toFixed(2)}</span>
+                                        </div>
+                                    )}
                                     <div className="flex justify-between font-medium">
                                         <span>Total</span>
-                                        <span>${getCartTotal().toFixed(2)}</span>
+                                        <span>${getTotalWithTax().toFixed(2)}</span>
                                     </div>
 
                                     <div className="mt-4 space-y-2">
@@ -528,14 +619,12 @@ export function PosSystem() {
                     <DialogHeader>
                         <DialogTitle>Finalizar venta</DialogTitle>
                         <DialogDescription>Completa la información para finalizar la venta.</DialogDescription>
-                    </DialogHeader>
-
-                    <div className="space-y-4 py-4">
+                    </DialogHeader>                    <div className="space-y-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="total" className="text-right">
                                 Total
                             </Label>
-                            <div className="col-span-3 font-medium">${getCartTotal().toFixed(2)}</div>
+                            <div className="col-span-3 font-medium">${getTotalWithTax().toFixed(2)}</div>
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="payment" className="text-right">
@@ -545,20 +634,20 @@ export function PosSystem() {
                                 id="payment"
                                 type="number"
                                 step="0.01"
-                                min={getCartTotal()}
+                                min={getTotalWithTax()}
                                 value={paymentAmount}
                                 onChange={(e) => setPaymentAmount(e.target.value)}
                                 placeholder="0.00"
                                 className="col-span-3"
                             />
                         </div>
-                        {paymentAmount && !isNaN(Number(paymentAmount)) && Number(paymentAmount) >= getCartTotal() && (
+                        {paymentAmount && !isNaN(Number(paymentAmount)) && Number(paymentAmount) >= getTotalWithTax() && (
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="change" className="text-right">
                                     Cambio
                                 </Label>
                                 <div className="col-span-3 font-medium">
-                                    ${(Number(paymentAmount) - getCartTotal()).toFixed(2)}
+                                    ${(Number(paymentAmount) - getTotalWithTax()).toFixed(2)}
                                 </div>
                             </div>
                         )}

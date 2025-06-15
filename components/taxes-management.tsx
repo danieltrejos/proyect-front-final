@@ -124,7 +124,7 @@ export function TaxesManagement() {
         variant: "destructive",
       })
       return
-    }    setIsCreating(true)
+    } setIsCreating(true)
     try {
       const response = await fetch(API_URL, {
         method: "POST",
@@ -177,7 +177,7 @@ export function TaxesManagement() {
         variant: "destructive",
       })
       return
-    }    setIsUpdating(true)
+    } setIsUpdating(true)
     try {
       const response = await fetch(`${API_URL}/${currentTax.id}`, {
         method: "PATCH",
@@ -247,7 +247,7 @@ export function TaxesManagement() {
   // Activar/Desactivar tax
   const toggleTaxStatus = async (tax: Tax) => {
     try {
-      const endpoint = tax.isActive 
+      const endpoint = tax.isActive
         ? `${API_URL}/${tax.id}/deactivate`
         : `${API_URL}/${tax.id}/activate`
 
@@ -444,7 +444,7 @@ export function TaxesManagement() {
                           <Edit className="mr-2 h-4 w-4" />
                           Editar
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => toggleTaxStatus(tax)}
                         >
                           {tax.isActive ? (
@@ -460,7 +460,7 @@ export function TaxesManagement() {
                             Establecer como predeterminado
                           </DropdownMenuItem>
                         )}
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => prepareDelete(tax)}
                           className="text-red-600"
                         >
