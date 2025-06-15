@@ -106,8 +106,7 @@ export function CustomerOrders() {
         setSales(salesData)
         setCustomers(customersData)
         setIsLoading(false)
-      } catch (error) {
-        console.error("Failed to fetch data:", error)
+      } catch (error) {        console.error("Failed to fetch data:", error)
         setIsLoading(false)
         toast({
           title: "Error",
@@ -119,29 +118,29 @@ export function CustomerOrders() {
 
     fetchData()
   }, [])
+
   const filteredSales = sales.filter((sale) => {
     // Filter by search term
     const searchMatch =
       sale.id.toString().includes(searchTerm) ||
-      sale.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      sale.items.some((item) => item.product.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      (sale.customer?.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      sale.items?.some((item) => item.product?.name?.toLowerCase().includes(searchTerm.toLowerCase())) || false
 
     // Filter by date
     const dateMatch = dateFilter ? new Date(sale.createdAt).toDateString() === dateFilter.toDateString() : true
 
     // Filter by customer
-    const customerMatch = customerFilter === "all" || sale.customer.id.toString() === customerFilter
+    const customerMatch = customerFilter === "all" || sale.customer?.id?.toString() === customerFilter
 
     // For now, we'll consider all sales as "completed" since the backend doesn't have status
     // Filter by status - we can add this logic later if needed
     const statusMatch = statusFilter === "all" || statusFilter === "completed"
 
-    return searchMatch && dateMatch && customerMatch && statusMatch
-  })
+    return searchMatch && dateMatch && customerMatch && statusMatch  })
 
   // Group sales by customer
   const salesByCustomer = filteredSales.reduce<Record<string, Sale[]>>((acc, sale) => {
-    const customerId = sale.customer.id.toString()
+    const customerId = sale.customer?.id?.toString() || 'unknown'
     if (!acc[customerId]) {
       acc[customerId] = []
     }
@@ -193,12 +192,11 @@ export function CustomerOrders() {
               <Select value={customerFilter} onValueChange={setCustomerFilter}>
                 <SelectTrigger className="w-full sm:w-[200px]">
                   <SelectValue placeholder="Filtrar por cliente" />
-                </SelectTrigger>
-                <SelectContent>
+                </SelectTrigger>                <SelectContent>
                   <SelectItem value="all">Todos los clientes</SelectItem>
                   {customers.map((customer) => (
                     <SelectItem key={customer.id} value={customer.id.toString()}>
-                      {customer.name}
+                      {customer.name || `Cliente ${customer.id}`}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -247,9 +245,9 @@ export function CustomerOrders() {
 
                 return (
                   <AccordionItem key={customerId} value={customerId}>
-                    <AccordionTrigger className="hover:bg-accent hover:text-accent-foreground px-4 rounded-md">
-                      <div className="flex items-center gap-2">
-                        <User className="h-5 w-5" />                        <span>{customer.name}</span>
+                    <AccordionTrigger className="hover:bg-accent hover:text-accent-foreground px-4 rounded-md">                      <div className="flex items-center gap-2">
+                        <User className="h-5 w-5" />
+                        <span>{customer.name || `Cliente ${customerId}`}</span>
                         <Badge variant="outline" className="ml-2">
                           {customerSales.length} pedidos
                         </Badge>
@@ -273,20 +271,19 @@ export function CustomerOrders() {
                             {customerSales.map((sale) => (
                               <TableRow key={sale.id}>
                                 <TableCell className="font-medium">#{sale.id}</TableCell>
-                                <TableCell>{new Date(sale.createdAt).toLocaleString()}</TableCell>
-                                <TableCell>
+                                <TableCell>{new Date(sale.createdAt).toLocaleString()}</TableCell>                                <TableCell>
                                   <ul className="list-disc list-inside">
-                                    {sale.items.map((item, index) => (
+                                    {sale.items?.map((item, index) => (
                                       <li key={index}>
-                                        {item.quantity}x {item.product.name}
+                                        {item.quantity}x {item.product?.name || 'Producto'}
                                       </li>
-                                    ))}
+                                    )) || <li>Sin items</li>}
                                   </ul>
                                 </TableCell>
                                 <TableCell>${sale.total.toLocaleString()}</TableCell>
                                 <TableCell>{sale.paymentMethod}</TableCell>
                                 <TableCell>{getStatusBadge()}</TableCell>
-                                <TableCell>{sale.user.name}</TableCell>
+                                <TableCell>{sale.user?.name || 'Usuario no especificado'}</TableCell>
                               </TableRow>
                             ))}
                           </TableBody>

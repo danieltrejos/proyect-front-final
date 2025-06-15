@@ -206,8 +206,7 @@ export function InvoicesManagement() {
             })
         } catch (error) {
             console.error("Error al descargar factura:", error)
-            toast({
-                title: "Error",
+            toast({                title: "Error",
                 description: "No se pudo descargar la factura",
                 variant: "destructive",
             })
@@ -219,11 +218,11 @@ export function InvoicesManagement() {
         setIsDetailDialogOpen(true)
     }
 
-    const handleFilterChange = (key: keyof InvoiceFilters, value: string | number) => {
+    const handleFilterChange = (key: keyof InvoiceFilters, value: string | number | undefined) => {
         setFilters(prev => ({
             ...prev,
             [key]: value,
-            page: key !== 'page' ? 1 : value // Reset page when filters change
+            page: key !== 'page' ? 1 : (typeof value === 'number' ? value : 1) // Reset page when filters change
         }))
     }
 
