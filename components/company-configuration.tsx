@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Building2, Upload, Save, MapPin, Mail, Phone, Globe, Clock, DollarSign } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { API_ENDPOINTS } from "@/lib/api-config"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -96,7 +97,7 @@ export function CompanyConfiguration() {
     const fetchCompanyData = async () => {
         try {
             setLoading(true)
-            const response = await fetch('http://localhost:8000/api/v1/companies/main')
+            const response = await fetch(`${API_ENDPOINTS.companies}/main`)
 
             if (response.ok) {
                 const companyData = await response.json()
@@ -149,10 +150,10 @@ export function CompanyConfiguration() {
     const handleSave = async () => {
         try {
             setSaving(true)
-
+            
             const url = company
-                ? `http://localhost:8000/api/v1/companies/${company.id}`
-                : 'http://localhost:8000/api/v1/companies'
+                ? `${API_ENDPOINTS.companies}/${company.id}`
+                : API_ENDPOINTS.companies
 
             const method = company ? 'PATCH' : 'POST'
 

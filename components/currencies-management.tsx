@@ -4,6 +4,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { Edit, MoreHorizontal, Plus, Trash, DollarSign, CheckCircle, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { API_ENDPOINTS } from "@/lib/api-config"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Dialog,
@@ -59,8 +60,6 @@ interface CurrencyFormData {
   decimalSeparator: string
 }
 
-const API_URL = "http://localhost:8000/api/v1/currencies"
-
 export function CurrenciesManagement() {
   const [currencies, setCurrencies] = useState<Currency[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -86,7 +85,7 @@ export function CurrenciesManagement() {
   const fetchCurrencies = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch(API_URL)
+      const response = await fetch(API_ENDPOINTS.currencies)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -138,7 +137,7 @@ export function CurrenciesManagement() {
 
     setIsCreating(true)
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(API_ENDPOINTS.currencies, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -194,7 +193,7 @@ export function CurrenciesManagement() {
     }
 
     try {
-      const response = await fetch(`${API_URL}/${currentCurrency.id}`, {
+      const response = await fetch(`${API_ENDPOINTS.currencies}/${currentCurrency.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -235,7 +234,7 @@ export function CurrenciesManagement() {
     if (!currencyToDelete) return
 
     try {
-      const response = await fetch(`${API_URL}/${currencyToDelete.id}`, {
+      const response = await fetch(`${API_ENDPOINTS.currencies}/${currencyToDelete.id}`, {
         method: "DELETE",
       })
 
@@ -263,10 +262,9 @@ export function CurrenciesManagement() {
 
   // Activar/Desactivar currency
   const toggleCurrencyStatus = async (currency: Currency) => {
-    try {
-      const endpoint = currency.isActive
-        ? `${API_URL}/${currency.id}/deactivate`
-        : `${API_URL}/${currency.id}/activate`
+    try {      const endpoint = currency.isActive
+        ? `${API_ENDPOINTS.currencies}/${currency.id}/deactivate`
+        : `${API_ENDPOINTS.currencies}/${currency.id}/activate`
 
       const response = await fetch(endpoint, {
         method: "PATCH",

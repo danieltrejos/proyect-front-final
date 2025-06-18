@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { CalendarIcon, Download, Eye, FileText, Search, Filter, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api-config"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -104,8 +105,6 @@ export function InvoicesManagement() {
     const [totalPages, setTotalPages] = useState(0)
     const [totalInvoices, setTotalInvoices] = useState(0)
 
-    const API_BASE_URL = "http://localhost:8000/api/v1"
-
     useEffect(() => {
         fetchInitialData()
     }, [])
@@ -115,14 +114,13 @@ export function InvoicesManagement() {
     }, [filters])
 
     const fetchInitialData = async () => {
-        try {
-            // Cargar clientes
-            const customersResponse = await fetch(`${API_BASE_URL}/customers`)
+        try {            // Cargar clientes
+            const customersResponse = await fetch(API_ENDPOINTS.customers)
             if (customersResponse.ok) {
                 const customersData = await customersResponse.json()
                 setCustomers(customersData)
             }            // Cargar usuarios
-            const usersResponse = await fetch(`${API_BASE_URL}/users`)
+            const usersResponse = await fetch(API_ENDPOINTS.users)
             if (usersResponse.ok) {
                 const usersData = await usersResponse.json()
                 setUsers(usersData)
@@ -157,7 +155,7 @@ export function InvoicesManagement() {
                 queryParams.append('endDate', filters.endDate)
             }
 
-            const url = `${API_BASE_URL}/invoices?${queryParams.toString()}`
+            const url = `${API_ENDPOINTS.invoices}?${queryParams.toString()}`
             console.log('Fetching invoices from:', url) // Debug log
             console.log('Filters being sent:', filters) // Debug log
 
@@ -198,10 +196,8 @@ export function InvoicesManagement() {
 
     const downloadInvoice = async (saleId: number, invoiceNumber: string) => {
         try {
-            console.log(`Downloading invoice for sale ID: ${saleId}, invoice: ${invoiceNumber}`)
-
-            // Abrir directamente la URL en una nueva ventana para evitar bloqueos
-            const downloadUrl = `${API_BASE_URL}/invoices/${saleId}/download`
+            console.log(`Downloading invoice for sale ID: ${saleId}, invoice: ${invoiceNumber}`)            // Abrir directamente la URL en una nueva ventana para evitar bloqueos
+            const downloadUrl = `${API_ENDPOINTS.invoices}/${saleId}/download`
 
             // Crear un enlace temporal y hacer clic en él
             const link = document.createElement('a')
@@ -232,7 +228,7 @@ export function InvoicesManagement() {
 
             // Como fallback, intentar abrir en nueva pestaña
             try {
-                const fallbackUrl = `${API_BASE_URL}/invoices/${saleId}/download`
+                const fallbackUrl = `${API_ENDPOINTS.invoices}/${saleId}/download`
                 window.open(fallbackUrl, '_blank')
 
                 toast({

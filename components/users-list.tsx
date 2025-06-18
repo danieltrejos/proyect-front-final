@@ -5,6 +5,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { Edit, MoreHorizontal, Plus, Search, Trash } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { API_ENDPOINTS } from "@/lib/api-config"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Dialog,
@@ -58,7 +59,7 @@ export function UsersList() {
         setIsLoading(true)
         console.log("Fetching users from backend...")
 
-        const response = await fetch('http://localhost:8000/api/v1/users')
+        const response = await fetch(API_ENDPOINTS.users)
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)

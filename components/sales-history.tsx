@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Calendar, Download, Search, User, ChevronLeft, ChevronRight, Filter, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { API_ENDPOINTS } from "@/lib/api-config"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -91,21 +92,17 @@ export function SalesHistory() {
     const fetchSalesHistory = async () => {
       try {
         setIsLoading(true)
-        console.log("🔄 Cargando datos del historial de ventas...")
-
-        // Obtener ventas desde el backend
-        console.log("📊 Fetching sales from:", "http://localhost:8000/api/v1/sales")
-        const salesResponse = await fetch("http://localhost:8000/api/v1/sales")
+        console.log("🔄 Cargando datos del historial de ventas...")        // Obtener ventas desde el backend
+        console.log("📊 Fetching sales from:", API_ENDPOINTS.sales)
+        const salesResponse = await fetch(API_ENDPOINTS.sales)
 
         if (!salesResponse.ok) {
           throw new Error(`HTTP error al obtener ventas: ${salesResponse.status}`)
         } const salesData = await salesResponse.json()
         console.log("✅ Sales data received:", salesData)
-        setSales(salesData)
-
-        // Obtener clientes para el filtro
-        console.log("👥 Fetching customers from:", "http://localhost:8000/api/v1/customers")
-        const customersResponse = await fetch("http://localhost:8000/api/v1/customers")
+        setSales(salesData)        // Obtener clientes para el filtro
+        console.log("👥 Fetching customers from:", API_ENDPOINTS.customers)
+        const customersResponse = await fetch(API_ENDPOINTS.customers)
 
         if (customersResponse.ok) {
           const customersData = await customersResponse.json()
@@ -113,11 +110,9 @@ export function SalesHistory() {
           setCustomers(customersData)
         } else {
           console.warn("⚠️ Could not fetch customers:", customersResponse.status)
-        }
-
-        // Obtener usuarios para el filtro
-        console.log("🔐 Fetching users from:", "http://localhost:8000/api/v1/users")
-        const usersResponse = await fetch("http://localhost:8000/api/v1/users")
+        }        // Obtener usuarios para el filtro
+        console.log("🔐 Fetching users from:", API_ENDPOINTS.users)
+        const usersResponse = await fetch(API_ENDPOINTS.users)
 
         if (usersResponse.ok) {
           const usersData = await usersResponse.json()

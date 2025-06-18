@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Beer, Minus, Plus, Receipt, Search, ShoppingCart, Trash, UserIcon, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api-config"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     Dialog,
@@ -105,20 +106,18 @@ export function PosSystem() {
     const [selectedUser, setSelectedUser] = useState<string>("")
     const [searchTerm, setSearchTerm] = useState("")
     const [defaultTax, setDefaultTax] = useState<Tax | null>(null)
-    const [company, setCompany] = useState<Company | null>(null)    // Estados para manejo de facturas
+    const [company, setCompany] = useState<Company | null>(null)
+    // Estados para manejo de facturas
     const [lastSale, setLastSale] = useState<SaleResponse | null>(null)
     const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false)
     const [isDownloadingInvoice, setIsDownloadingInvoice] = useState(false)
-
-    // URL del API de productos
-    const API_URL = "http://localhost:8000/api/v1/products"
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setIsLoading(true);                // Obtener productos desde la API (todos, sin paginación para POS)
-                console.log("Obteniendo productos desde:", API_URL);
-                const productsResponse = await fetch(`${API_URL}?all=true`);
+                console.log("Obteniendo productos desde:", API_ENDPOINTS.products);
+                const productsResponse = await fetch(`${API_ENDPOINTS.products}?all=true`);
 
                 if (!productsResponse.ok) {
                     throw new Error(`Error HTTP al obtener productos: ${productsResponse.status}`);
@@ -126,19 +125,17 @@ export function PosSystem() {
 
                 const productsData = await productsResponse.json();
                 console.log("Datos de productos obtenidos:", productsData);
-                setProducts(productsData);
-
-                // Obtener clientes desde el backend
-                console.log("Cargando clientes desde:", "http://localhost:8000/api/v1/customers");
-                const customersResponse = await fetch("http://localhost:8000/api/v1/customers");
+                setProducts(productsData);                // Obtener clientes desde el backend
+                console.log("Cargando clientes desde:", API_ENDPOINTS.customers);
+                const customersResponse = await fetch(API_ENDPOINTS.customers);
 
                 if (!customersResponse.ok) {
                     throw new Error(`Error HTTP al obtener clientes: ${customersResponse.status}`);
                 } const customersData = await customersResponse.json();
                 console.log("Datos de clientes obtenidos:", customersData);
                 setCustomers(customersData);                // Obtener usuarios desde el backend
-                console.log("Cargando usuarios desde:", "http://localhost:8000/api/v1/users");
-                const usersResponse = await fetch("http://localhost:8000/api/v1/users");
+                console.log("Cargando usuarios desde:", API_ENDPOINTS.users);
+                const usersResponse = await fetch(API_ENDPOINTS.users);
 
                 if (!usersResponse.ok) {
                     throw new Error(`Error HTTP al obtener usuarios: ${usersResponse.status}`);
@@ -150,12 +147,10 @@ export function PosSystem() {
                 // Seleccionar el primer usuario por defecto
                 if (usersData.length > 0) {
                     setSelectedUser(usersData[0].id.toString());
-                }
-
-                // Obtener impuesto por defecto
-                console.log("Cargando impuesto por defecto desde:", "http://localhost:8000/api/v1/taxes");
+                }                // Obtener impuesto por defecto
+                console.log("Cargando impuesto por defecto desde:", API_ENDPOINTS.taxes);
                 try {
-                    const taxesResponse = await fetch("http://localhost:8000/api/v1/taxes");
+                    const taxesResponse = await fetch(API_ENDPOINTS.taxes);
                     if (taxesResponse.ok) {
                         const taxesData = await taxesResponse.json();
                         const defaultTaxFound = taxesData.find((tax: Tax) => tax.isDefault && tax.isActive);
@@ -166,12 +161,10 @@ export function PosSystem() {
                     }
                 } catch (error) {
                     console.error("Error al obtener impuesto por defecto:", error);
-                }
-
-                // Obtener información de la empresa
-                console.log("Cargando empresa desde:", "http://localhost:8000/api/v1/companies");
+                }                // Obtener información de la empresa
+                console.log("Cargando empresa desde:", API_ENDPOINTS.companies);
                 try {
-                    const companiesResponse = await fetch("http://localhost:8000/api/v1/companies");
+                    const companiesResponse = await fetch(API_ENDPOINTS.companies);
                     if (companiesResponse.ok) {
                         const companiesData = await companiesResponse.json();
                         if (companiesData.length > 0) {
@@ -268,7 +261,7 @@ export function PosSystem() {
         try {
             setIsDownloadingInvoice(true)
 
-            const downloadUrl = `http://localhost:8000/api/v1/invoices/${saleId}/download`
+            const downloadUrl = `${API_ENDPOINTS.invoices}/${saleId}/download`
 
             // Método directo: crear enlace y hacer click
             const link = document.createElement('a')
@@ -368,8 +361,8 @@ export function PosSystem() {
                 companyId: company.id
             };
 
-            console.log("Enviando datos de venta:", saleData);// Crear la venta en el backend
-            const response = await fetch('http://localhost:8000/api/v1/sales', {
+            console.log("Enviando datos de venta:", saleData);            // Crear la venta en el backend
+            const response = await fetch(API_ENDPOINTS.sales, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(saleData)

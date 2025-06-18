@@ -5,6 +5,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { Edit, MoreHorizontal, Plus, Trash, Search, X, Filter } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { API_ENDPOINTS } from "@/lib/api-config"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Dialog,
@@ -65,9 +66,6 @@ interface ProductResponse {
   totalPages: number
 }
 
-// URL base de la API
-const API_URL = "http://localhost:8000/api/v1/products"
-
 export function ProductsList() {
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -121,7 +119,7 @@ export function ProductsList() {
         queryParams.append('isActive', filters.isActive.toString())
       }
 
-      const url = `${API_URL}?${queryParams.toString()}`
+      const url = `${API_ENDPOINTS.products}?${queryParams.toString()}`
       console.log('Fetching products from:', url)
 
       const response = await fetch(url)
@@ -230,10 +228,8 @@ export function ProductsList() {
       if (isNaN(priceNumber) || isNaN(stockNumber)) {
         toast({ title: "Error", description: "Precio y Stock deben ser números válidos.", variant: "destructive" })
         return
-      }
-
-      //! Enviar datos a la API POST
-      const response = await fetch(API_URL, {
+      }      //! Enviar datos a la API POST
+      const response = await fetch(API_ENDPOINTS.products, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -297,10 +293,8 @@ export function ProductsList() {
       if (isNaN(priceNumber) || isNaN(stockNumber)) {
         toast({ title: "Error", description: "Precio y Stock deben ser números válidos.", variant: "destructive" })
         return
-      }
-
-      //!Enviar petición PUT a la API ---
-      const response = await fetch(`${API_URL}/${currentProduct.id}`, {
+      }      //!Enviar petición PUT a la API ---
+      const response = await fetch(`${API_ENDPOINTS.products}/${currentProduct.id}`, {
         method: 'PATCH', // PATCH la soporta actualizaciones parciales
         headers: {
           'Content-Type': 'application/json',
@@ -349,9 +343,8 @@ export function ProductsList() {
     //   return;
     // }
 
-    try {
-      // --- MODIFICACIÓN: Enviar petición DELETE a la API ---
-      const response = await fetch(`${API_URL}/${id}`, {
+    try {      // --- MODIFICACIÓN: Enviar petición DELETE a la API ---
+      const response = await fetch(`${API_ENDPOINTS.products}/${id}`, {
         method: 'DELETE',
       })
 

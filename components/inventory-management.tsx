@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { ArrowUpDown, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { API_ENDPOINTS } from "@/lib/api-config"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Dialog,
@@ -25,8 +26,6 @@ interface Product {
   stock: number
   description: string
 }
-
-const API_URL = "http://localhost:8000/api/v1/products"
 
 export function InventoryManagement() {
   const [products, setProducts] = useState<Product[]>([])
@@ -121,7 +120,7 @@ export function InventoryManagement() {
   }, [])
   const fetchProducts = async () => {
     try {
-      const response = await fetch(`${API_URL}?all=true`)
+      const response = await fetch(`${API_ENDPOINTS.products}?all=true`)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -174,7 +173,7 @@ export function InventoryManagement() {
         })
         return
       }      // Enviar solicitud al API para reabastecer el producto
-      const response = await fetch(`${API_URL}/${currentProduct.id}/restock`, {
+      const response = await fetch(`${API_ENDPOINTS.products}/${currentProduct.id}/restock`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount })

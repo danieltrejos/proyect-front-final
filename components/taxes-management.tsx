@@ -4,6 +4,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { Edit, MoreHorizontal, Plus, Trash, Calculator, CheckCircle, XCircle, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { API_ENDPOINTS } from "@/lib/api-config"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Dialog,
@@ -52,8 +53,6 @@ interface TaxFormData {
   rate: string
 }
 
-const API_URL = "http://localhost:8000/api/v1/taxes"
-
 export function TaxesManagement() {
   const [taxes, setTaxes] = useState<Tax[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -75,7 +74,7 @@ export function TaxesManagement() {
   const fetchTaxes = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch(API_URL)
+      const response = await fetch(API_ENDPOINTS.taxes)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -126,7 +125,7 @@ export function TaxesManagement() {
       return
     } setIsCreating(true)
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(API_ENDPOINTS.taxes, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -179,7 +178,7 @@ export function TaxesManagement() {
       return
     } setIsUpdating(true)
     try {
-      const response = await fetch(`${API_URL}/${currentTax.id}`, {
+      const response = await fetch(`${API_ENDPOINTS.taxes}/${currentTax.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -218,7 +217,7 @@ export function TaxesManagement() {
     if (!taxToDelete) return
 
     try {
-      const response = await fetch(`${API_URL}/${taxToDelete.id}`, {
+      const response = await fetch(`${API_ENDPOINTS.taxes}/${taxToDelete.id}`, {
         method: "DELETE",
       })
 
@@ -246,10 +245,9 @@ export function TaxesManagement() {
 
   // Activar/Desactivar tax
   const toggleTaxStatus = async (tax: Tax) => {
-    try {
-      const endpoint = tax.isActive
-        ? `${API_URL}/${tax.id}/deactivate`
-        : `${API_URL}/${tax.id}/activate`
+    try {      const endpoint = tax.isActive
+        ? `${API_ENDPOINTS.taxes}/${tax.id}/deactivate`
+        : `${API_ENDPOINTS.taxes}/${tax.id}/activate`
 
       const response = await fetch(endpoint, {
         method: "PATCH",
@@ -278,7 +276,7 @@ export function TaxesManagement() {
   // Establecer como predeterminado
   const setAsDefault = async (tax: Tax) => {
     try {
-      const response = await fetch(`${API_URL}/${tax.id}/set-default`, {
+      const response = await fetch(`${API_ENDPOINTS.taxes}/${tax.id}/set-default`, {
         method: "PATCH",
       })
 

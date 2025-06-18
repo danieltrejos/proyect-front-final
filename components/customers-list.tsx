@@ -5,6 +5,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { Edit, MoreHorizontal, Plus, Search, Trash } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { API_ENDPOINTS } from "@/lib/api-config"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Dialog,
@@ -55,7 +56,7 @@ export function CustomersList() {
         setIsLoading(true)
         console.log("Fetching customers from backend...")
 
-        const response = await fetch('http://localhost:8000/api/v1/customers')
+        const response = await fetch(API_ENDPOINTS.customers)
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
@@ -101,7 +102,7 @@ export function CustomersList() {
 
       console.log("Creating new customer:", formData)
 
-      const response = await fetch('http://localhost:8000/api/v1/customers', {
+      const response = await fetch(API_ENDPOINTS.customers, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -151,7 +152,7 @@ export function CustomersList() {
 
       console.log("Updating customer:", currentCustomer.id, formData)
 
-      const response = await fetch(`http://localhost:8000/api/v1/customers/${currentCustomer.id}`, {
+      const response = await fetch(`${API_ENDPOINTS.customers}/${currentCustomer.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

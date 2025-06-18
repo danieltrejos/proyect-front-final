@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Calendar, ClipboardList, Search, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { API_ENDPOINTS } from "@/lib/api-config"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -82,12 +83,10 @@ export function CustomerOrders() {
     const fetchData = async () => {
       try {
         setIsLoading(true)
-        console.log("🔄 Fetching sales and customers from backend...")
-
-        // Fetch en paralelo para ventas y clientes
+        console.log("🔄 Fetching sales and customers from backend...")        // Fetch en paralelo para ventas y clientes
         const [salesResponse, customersResponse] = await Promise.all([
-          fetch('http://localhost:8000/api/v1/sales'),
-          fetch('http://localhost:8000/api/v1/customers')
+          fetch(API_ENDPOINTS.sales),
+          fetch(API_ENDPOINTS.customers)
         ])
 
         if (!salesResponse.ok) {
