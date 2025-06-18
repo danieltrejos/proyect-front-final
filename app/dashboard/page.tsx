@@ -24,8 +24,7 @@ export default function Home() {
           duration={5000}
           logoSrc="/logo_oficial.png"
           redirectPath="/products"
-        />
-      ) : (
+        />) : (
         <DashboardLayout>
           <ProductsList />
         </DashboardLayout>
