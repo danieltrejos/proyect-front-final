@@ -150,7 +150,7 @@ export function CompanyConfiguration() {
     const handleSave = async () => {
         try {
             setSaving(true)
-            
+
             const url = company
                 ? `${API_ENDPOINTS.companies}/${company.id}`
                 : API_ENDPOINTS.companies

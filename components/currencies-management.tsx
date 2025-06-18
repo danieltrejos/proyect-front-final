@@ -262,7 +262,8 @@ export function CurrenciesManagement() {
 
   // Activar/Desactivar currency
   const toggleCurrencyStatus = async (currency: Currency) => {
-    try {      const endpoint = currency.isActive
+    try {
+      const endpoint = currency.isActive
         ? `${API_ENDPOINTS.currencies}/${currency.id}/deactivate`
         : `${API_ENDPOINTS.currencies}/${currency.id}/activate`
 

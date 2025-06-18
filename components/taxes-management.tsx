@@ -245,7 +245,8 @@ export function TaxesManagement() {
 
   // Activar/Desactivar tax
   const toggleTaxStatus = async (tax: Tax) => {
-    try {      const endpoint = tax.isActive
+    try {
+      const endpoint = tax.isActive
         ? `${API_ENDPOINTS.taxes}/${tax.id}/deactivate`
         : `${API_ENDPOINTS.taxes}/${tax.id}/activate`
 
