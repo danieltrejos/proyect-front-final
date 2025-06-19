@@ -29,7 +29,12 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
   if (!response.ok) {
     throw new Error("Failed to fetch dashboard stats");
   }
-  return response.json();
+  const data = await response.json();
+  console.log("[fetchDashboardStats] response:", data);
+  // Si la respuesta tiene la propiedad dashboard, úsala, si no, usa el objeto completo
+  if (data && data.dashboard) return data.dashboard;
+  if (data && typeof data.totalProducts === "number") return data;
+  throw new Error("Estructura inesperada en dashboard stats");
 }
 
 export async function fetchSalesByMonth(): Promise<SalesByMonth[]> {
@@ -37,7 +42,11 @@ export async function fetchSalesByMonth(): Promise<SalesByMonth[]> {
   if (!response.ok) {
     throw new Error("Failed to fetch sales by month");
   }
-  return response.json();
+  const data = await response.json();
+  console.log("[fetchSalesByMonth] response:", data);
+  if (data && data.salesByMonth) return data.salesByMonth;
+  if (Array.isArray(data)) return data;
+  throw new Error("Estructura inesperada en sales by month");
 }
 
 export async function fetchRecentSales(): Promise<RecentSale[]> {
@@ -45,5 +54,9 @@ export async function fetchRecentSales(): Promise<RecentSale[]> {
   if (!response.ok) {
     throw new Error("Failed to fetch recent sales");
   }
-  return response.json();
+  const data = await response.json();
+  console.log("[fetchRecentSales] response:", data);
+  if (data && data.recentSales) return data.recentSales;
+  if (Array.isArray(data)) return data;
+  throw new Error("Estructura inesperada en recent sales");
 }

@@ -10,4 +10,10 @@ export const API_ENDPOINTS = {
   companies: `${API_BASE_URL}/companies`,
   taxes: `${API_BASE_URL}/taxes`,
   currencies: `${API_BASE_URL}/currencies`,
+  // Endpoints para estadísticas
+  stats: {
+    dashboard: `${API_BASE_URL}/stats/dashboard`,
+    salesByMonth: `${API_BASE_URL}/stats/sales-by-month`,
+    recentSales: `${API_BASE_URL}/stats/recent-sales`,
+  },
 };
