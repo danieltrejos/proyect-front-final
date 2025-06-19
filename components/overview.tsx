@@ -20,13 +20,13 @@ export function Overview() {
         setIsLoading(true)
         setError(null)
         const salesData = await fetchSalesByMonth()
-        
+
         // Transform the API data to chart format
         const chartData = salesData.map((item: SalesByMonth) => ({
           name: formatMonthName(item.month),
           total: item.revenue,
         }))
-        
+
         setData(chartData)
       } catch (error) {
         console.error("Failed to fetch sales data:", error)
@@ -75,12 +75,12 @@ export function Overview() {
   return (
     <ResponsiveContainer width="100%" height={350}>
       <BarChart data={data}>
-        <XAxis 
-          dataKey="name" 
-          stroke="#888888" 
-          fontSize={12} 
-          tickLine={false} 
-          axisLine={false} 
+        <XAxis
+          dataKey="name"
+          stroke="#888888"
+          fontSize={12}
+          tickLine={false}
+          axisLine={false}
         />
         <YAxis
           stroke="#888888"
@@ -92,10 +92,10 @@ export function Overview() {
             return `$${(value / 1000).toFixed(0)}K`
           }}
         />
-        <Bar 
-          dataKey="total" 
-          fill="#ef4444" 
-          radius={[4, 4, 0, 0]} 
+        <Bar
+          dataKey="total"
+          fill="#ef4444"
+          radius={[4, 4, 0, 0]}
         />
       </BarChart>
     </ResponsiveContainer>

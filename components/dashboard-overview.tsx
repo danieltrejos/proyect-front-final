@@ -78,8 +78,8 @@ export function DashboardOverview() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>            <div className="text-2xl font-bold">
-              {isLoading ? "Cargando..." : stats.lowStockCount}
-            </div>
+            {isLoading ? "Cargando..." : stats.lowStockCount}
+          </div>
             <p className="text-xs text-muted-foreground">Stock menor a 100 unidades</p>
           </CardContent>
         </Card>
