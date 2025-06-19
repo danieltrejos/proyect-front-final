@@ -3,40 +3,31 @@
 import { useEffect, useState } from "react"
 import { Beer, DollarSign, Package, TrendingUp } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Overview } from "@/components/overview"
 import { RecentSales } from "@/components/recent-sales"
+import { fetchDashboardStats, DashboardStats } from "@/lib/stats-api"
 
 export function DashboardOverview() {
   const [isLoading, setIsLoading] = useState(true)
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<DashboardStats>({
     totalProducts: 0,
-    lowStock: 0,
-    totalSales: 0,
-    revenue: 0,
+    lowStockCount: 0,
+    monthlySales: 0,
+    monthlyRevenue: 0,
   })
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Simulo un fetch a la API
     const fetchData = async () => {
       try {
-
-        // Conectar api
-        // const response = await fetch('http://localhost:8000/api/v1/stats')
-        // const data = await response.json()
-
-        // Por ahora usamos datos mockeados
-        setTimeout(() => {
-          setStats({
-            totalProducts: 24,
-            lowStock: 5,
-            totalSales: 142,
-            revenue: 2500000,
-          })
-          setIsLoading(false)
-        }, 1000)
+        setIsLoading(true)
+        setError(null)
+        const dashboardStats = await fetchDashboardStats()
+        setStats(dashboardStats)
       } catch (error) {
         console.error("Failed to fetch stats:", error)
+        setError("Error al cargar las estadísticas")
+      } finally {
         setIsLoading(false)
       }
     }
@@ -44,11 +35,28 @@ export function DashboardOverview() {
     fetchData()
   }, [])
 
+  // Format currency for display
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+    }).format(amount)
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Vista General - Armando debe conectar al backend</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Vista General del Dashboard</h1>
       </div>
+
+      {error && (
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="pt-6">
+            <p className="text-red-600">{error}</p>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -57,8 +65,10 @@ export function DashboardOverview() {
             <Beer className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{isLoading ? "Loading..." : stats.totalProducts}</div>
-            <p className="text-xs text-muted-foreground">Diferentes tipos de cerveza</p>
+            <div className="text-2xl font-bold">
+              {isLoading ? "Cargando..." : stats.totalProducts}
+            </div>
+            <p className="text-xs text-muted-foreground">Productos en el inventario</p>
           </CardContent>
         </Card>
 
@@ -67,77 +77,63 @@ export function DashboardOverview() {
             <CardTitle className="text-sm font-medium">Productos con bajo stock</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{isLoading ? "Loading..." : stats.lowStock}</div>
-            <p className="text-xs text-muted-foreground">Productos que necesitan reabastecerse</p>
+          <CardContent>            <div className="text-2xl font-bold">
+              {isLoading ? "Cargando..." : stats.lowStockCount}
+            </div>
+            <p className="text-xs text-muted-foreground">Stock menor a 100 unidades</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ventas totales</CardTitle>
+            <CardTitle className="text-sm font-medium">Ventas este mes</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{isLoading ? "Loading..." : stats.totalSales}</div>
-            <p className="text-xs text-muted-foreground">Ordenes de este mes</p>
+            <div className="text-2xl font-bold">
+              {isLoading ? "Cargando..." : stats.monthlySales}
+            </div>
+            <p className="text-xs text-muted-foreground">Órdenes de este mes</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ganancia</CardTitle>
+            <CardTitle className="text-sm font-medium">Ingresos este mes</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{isLoading ? "Loading..." : `$${stats.revenue}`}</div>
-            <p className="text-xs text-muted-foreground">Incremento +4.1% desde el ultimo mes</p>
+            <div className="text-2xl font-bold">
+              {isLoading ? "Cargando..." : formatCurrency(stats.monthlyRevenue)}
+            </div>
+            <p className="text-xs text-muted-foreground">Ingresos del mes actual</p>
+          </CardContent>
+        </Card>      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="col-span-4">
+          <CardHeader>
+            <CardTitle>Vista general de ventas</CardTitle>
+            <CardDescription>
+              Ingresos por mes de los últimos 12 meses
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pl-2">
+            <Overview />
+          </CardContent>
+        </Card>
+        <Card className="col-span-3">
+          <CardHeader>
+            <CardTitle>Ventas recientes</CardTitle>
+            <CardDescription>
+              {isLoading ? "Cargando..." : `${stats.monthlySales} ventas este mes`}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RecentSales />
           </CardContent>
         </Card>
       </div>
-
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Vista general</TabsTrigger>
-          <TabsTrigger value="analytics">Estadisticas</TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
-              <CardHeader>
-                <CardTitle>Vista general de ventas</CardTitle>
-              </CardHeader>
-              <CardContent className="pl-2">
-                <Overview />
-              </CardContent>
-            </Card>
-            <Card className="col-span-3">
-              <CardHeader>
-                <CardTitle>Ordenes recientes</CardTitle>
-                <CardDescription>Se han hecho 20 ventas.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <RecentSales />
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-        <TabsContent value="analytics" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-7">
-              <CardHeader>
-                <CardTitle>Estadisticas</CardTitle>
-                <CardDescription>Las estadistcas detalladas van aca.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[400px] flex items-center justify-center text-muted-foreground">
-                  Las estadisticas detalladas de las ventas las hará en ensucho y tiene que conectar las basicas sacadas desde el backend.
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
     </div>
   )
 }
