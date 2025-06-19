@@ -5,7 +5,6 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { Edit, MoreHorizontal, Plus, Trash, Search, X, Filter } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { API_ENDPOINTS } from "@/lib/api-config"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Dialog,
@@ -36,6 +35,22 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/hooks/use-toast"
 
+const PRODUCT_TYPES = [
+  'Amber Ale',
+  'Blonde Ale',
+  'Bock',
+  'Cerveza',
+  'Fruit Beer',
+  'Gaseosa',
+  'IPA',
+  'Lager',
+  'Pale Ale',
+  'Pilsner',
+  'Porter',
+  'Stout',
+  'Wheat Beer'
+]
+
 interface Product {
   id: number
   name: string
@@ -65,6 +80,9 @@ interface ProductResponse {
   limit: number
   totalPages: number
 }
+
+// URL base de la API
+const API_URL = "http://localhost:8000/api/v1/products"
 
 export function ProductsList() {
   const [products, setProducts] = useState<Product[]>([])
@@ -119,7 +137,7 @@ export function ProductsList() {
         queryParams.append('isActive', filters.isActive.toString())
       }
 
-      const url = `${API_ENDPOINTS.products}?${queryParams.toString()}`
+      const url = `${API_URL}?${queryParams.toString()}`
       console.log('Fetching products from:', url)
 
       const response = await fetch(url)
@@ -228,8 +246,10 @@ export function ProductsList() {
       if (isNaN(priceNumber) || isNaN(stockNumber)) {
         toast({ title: "Error", description: "Precio y Stock deben ser números válidos.", variant: "destructive" })
         return
-      }      //! Enviar datos a la API POST
-      const response = await fetch(API_ENDPOINTS.products, {
+      }
+
+      //! Enviar datos a la API POST
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -293,8 +313,10 @@ export function ProductsList() {
       if (isNaN(priceNumber) || isNaN(stockNumber)) {
         toast({ title: "Error", description: "Precio y Stock deben ser números válidos.", variant: "destructive" })
         return
-      }      //!Enviar petición PUT a la API ---
-      const response = await fetch(`${API_ENDPOINTS.products}/${currentProduct.id}`, {
+      }
+
+      //!Enviar petición PUT a la API ---
+      const response = await fetch(`${API_URL}/${currentProduct.id}`, {
         method: 'PATCH', // PATCH la soporta actualizaciones parciales
         headers: {
           'Content-Type': 'application/json',
@@ -343,8 +365,9 @@ export function ProductsList() {
     //   return;
     // }
 
-    try {      // --- MODIFICACIÓN: Enviar petición DELETE a la API ---
-      const response = await fetch(`${API_ENDPOINTS.products}/${id}`, {
+    try {
+      // --- MODIFICACIÓN: Enviar petición DELETE a la API ---
+      const response = await fetch(`${API_URL}/${id}`, {
         method: 'DELETE',
       })
 
@@ -424,12 +447,25 @@ export function ProductsList() {
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="name" className="text-right">Nombre</Label>
                   <Input id="name" name="name" value={formData.name} onChange={handleInputChange} className="col-span-3" />
-                </div>
-
-                {/* Input Tipo */}
+                </div>                {/* Input Tipo */}
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="type" className="text-right">Tipo</Label>
-                  <Input id="type" name="type" value={formData.type} onChange={handleInputChange} className="col-span-3" placeholder="Ej: Lager, Ipa, Ale (opcional)" />
+                  <Select
+                    value={formData.type || "sin-tipo"}
+                    onValueChange={(value) => setFormData({ ...formData, type: value === "sin-tipo" ? "" : value })}
+                  >
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue placeholder="Seleccionar tipo..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sin-tipo">Sin tipo</SelectItem>
+                      {PRODUCT_TYPES.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Input Precio */}
@@ -732,12 +768,25 @@ export function ProductsList() {
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-name" className="text-right">Nombre</Label>
               <Input id="edit-name" name="name" value={formData.name} onChange={handleInputChange} className="col-span-3" />
-            </div>
-
-            {/* Input Tipo */}
+            </div>            {/* Input Tipo */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-type" className="text-right">Tipo</Label>
-              <Input id="edit-type" name="type" value={formData.type} onChange={handleInputChange} className="col-span-3" placeholder="Ej: Laptop, Cerveza (opcional)" />
+              <Select
+                value={formData.type || "sin-tipo"}
+                onValueChange={(value) => setFormData({ ...formData, type: value === "sin-tipo" ? "" : value })}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Seleccionar tipo..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sin-tipo">Sin tipo</SelectItem>
+                  {PRODUCT_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Input Precio */}

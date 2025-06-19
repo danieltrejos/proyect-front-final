@@ -333,7 +333,7 @@ export function CustomersList() {
                 {filteredCustomers.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center">
-                      No customers found
+                      No se encontraron clientes
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -350,13 +350,13 @@ export function CustomersList() {
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
                               <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Open menu</span>
+                              <span className="sr-only">Abrir menú</span>
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>                              <DropdownMenuItem onClick={() => openEditDialog(customer)}>
+                            <DropdownMenuLabel>Acciones</DropdownMenuLabel>                              <DropdownMenuItem onClick={() => openEditDialog(customer)}>
                               <Edit className="mr-2 h-4 w-4" />
-                              Edit
+                              Editar
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => handleDeleteCustomer(customer.id)}
@@ -364,7 +364,7 @@ export function CustomersList() {
                               className="text-muted-foreground"
                             >
                               <Trash className="mr-2 h-4 w-4" />
-                              Delete (Disabled)
+                              Eliminar (Disabled)
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -382,13 +382,13 @@ export function CustomersList() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Customer</DialogTitle>
-            <DialogDescription>Update customer information.</DialogDescription>
+            <DialogTitle>Editar Cliente</DialogTitle>
+            <DialogDescription>Actualizar información del cliente.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-name" className="text-right">
-                Name
+                Nombre
               </Label>
               <Input
                 id="edit-name"
@@ -412,7 +412,7 @@ export function CustomersList() {
               />
             </div>            <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-phone" className="text-right">
-                Phone
+                Telefono
               </Label>
               <Input
                 id="edit-phone"
@@ -425,9 +425,9 @@ export function CustomersList() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-              Cancel
+              Cancelar
             </Button>
-            <Button onClick={handleEditCustomer}>Save Changes</Button>
+            <Button onClick={handleEditCustomer}>Guardar Cambios</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
