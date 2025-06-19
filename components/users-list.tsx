@@ -98,7 +98,6 @@ export function UsersList() {
       role: value,
     })
   }
-
   const handleAddUser = async () => {
     try {
       // Validate form data
@@ -120,51 +119,48 @@ export function UsersList() {
         return
       }
 
-      // In a real app, you would send to your API
-      // const response = await fetch('http://localhost:8000/api/v1/users', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     name: formData.name,
-      //     email: formData.email,
-      //     role: formData.role,
-      //     password: formData.password
-      //   })
-      // })
-      // const data = await response.json()      // For demo purposes, simulate adding to the list
-      const newUser: User = {
-        id: users.length + 1,
-        name: formData.name,
-        email: formData.email,
-        role: formData.role,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+      // Send user to API
+      const response = await fetch(API_ENDPOINTS.users, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          role: formData.role,
+          password: formData.password
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error creating user: ${response.status}`);
       }
 
-      setUsers([...users, newUser])
-      setIsAddDialogOpen(false)
+      const newUser = await response.json();
+      console.log("User created:", newUser);
+
+      setUsers([...users, newUser]);
+      setIsAddDialogOpen(false);
       setFormData({
         name: "",
         email: "",
         role: "bartender",
         password: "",
         confirmPassword: "",
-      })
+      });
 
       toast({
         title: "Success",
-        description: "Usuairio añadido correctamente",
-      })
+        description: "Usuario añadido correctamente",
+      });
     } catch (error) {
-      console.error("Failed to add user:", error)
+      console.error("Failed to add user:", error);
       toast({
         title: "Error",
-        description: "FAllo al añadir el usuario",
+        description: "Fallo al añadir el usuario",
         variant: "destructive",
-      })
+      });
     }
   }
-
   const handleEditUser = async () => {
     if (!currentUser) return
 
@@ -186,37 +182,36 @@ export function UsersList() {
           variant: "destructive",
         })
         return
+      }      // Send update to API
+      const response = await fetch(`${API_ENDPOINTS.users}/${currentUser.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          role: formData.role,
+          ...(formData.password ? { password: formData.password } : {})
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error updating user: ${response.status}`);
       }
 
-      // In a real app, you would send to your API
-      // const response = await fetch(`http://localhost:8000/api/v1/users/${currentUser.id}`, {
-      //   method: 'PUT',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     name: formData.name,
-      //     email: formData.email,
-      //     role: formData.role,
-      //     ...(formData.password ? { password: formData.password } : {})
-      //   })
-      // })
-      // const data = await response.json()
+      const updatedUser = await response.json();
+      console.log("User updated:", updatedUser);
 
-      // For demo purposes, update the list
+      // Update the list with the updated user
       const updatedUsers = users.map((user) => {
         if (user.id === currentUser.id) {
-          return {
-            ...user,
-            name: formData.name,
-            email: formData.email,
-            role: formData.role,
-          }
+          return updatedUser;
         }
-        return user
-      })
+        return user;
+      });
 
-      setUsers(updatedUsers)
-      setIsEditDialogOpen(false)
-      setCurrentUser(null)
+      setUsers(updatedUsers);
+      setIsEditDialogOpen(false);
+      setCurrentUser(null);
 
       toast({
         title: "Success",

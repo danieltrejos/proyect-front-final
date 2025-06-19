@@ -148,12 +148,10 @@ export function CustomersList() {
           variant: "destructive",
         })
         return
-      }
-
-      console.log("Updating customer:", currentCustomer.id, formData)
+      } console.log("Updating customer:", currentCustomer.id, formData)
 
       const response = await fetch(`${API_ENDPOINTS.customers}/${currentCustomer.id}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
@@ -163,7 +161,7 @@ export function CustomersList() {
       }
 
       const updatedCustomer = await response.json()
-      console.log("✅ Customer updated:", updatedCustomer)
+      console.log("✅ Cliente actualizado:", updatedCustomer)
 
       // Update the local state
       const updatedCustomers = customers.map((customer) => {

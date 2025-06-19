@@ -138,8 +138,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                       href={route.href}
                       onClick={() => setOpen(false)}
                       className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${pathname === route.href
-                          ? "bg-accent text-accent-foreground"
-                          : "hover:bg-accent/50"
+                        ? "bg-accent text-accent-foreground"
+                        : "hover:bg-accent/50"
                         }`}
                     >
                       {route.icon}
@@ -199,8 +199,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     key={route.href}
                     href={route.href}
                     className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${pathname === route.href
-                        ? "bg-accent text-accent-foreground"
-                        : "hover:bg-accent/50"
+                      ? "bg-accent text-accent-foreground"
+                      : "hover:bg-accent/50"
                       }`}
                   >
                     {route.icon}
@@ -259,9 +259,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Configuración</span>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="http://localhost:3000/">
+                <DropdownMenuSeparator />                <DropdownMenuItem asChild>
+                  <Link href="/">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Cerrar sesión</span>
                   </Link>
