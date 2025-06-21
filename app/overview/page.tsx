@@ -2,11 +2,14 @@
 
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { DashboardOverview } from "@/components/dashboard-overview"
+import { ProtectedRoute } from "@/components/auth/protected-route"
 
 export default function OverviewPage() {
     return (
-        <DashboardLayout>
-            <DashboardOverview />
-        </DashboardLayout>
+        <ProtectedRoute>
+            <DashboardLayout>
+                <DashboardOverview />
+            </DashboardLayout>
+        </ProtectedRoute>
     )
 }

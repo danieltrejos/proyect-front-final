@@ -2,11 +2,14 @@
 
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { InvoicesManagement } from "@/components/invoices-management"
+import { ProtectedRoute } from "@/components/auth/protected-route"
 
 export default function InvoicesPage() {
     return (
-        <DashboardLayout>
-            <InvoicesManagement />
-        </DashboardLayout>
+        <ProtectedRoute>
+            <DashboardLayout>
+                <InvoicesManagement />
+            </DashboardLayout>
+        </ProtectedRoute>
     )
 }

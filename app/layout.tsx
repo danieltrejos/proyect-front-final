@@ -22,7 +22,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">      <body className={inter.className}>        {/* Configurado para mantener el tema oscuro siempre */}
+    <html lang="en">
+      <body className={inter.className}>
+        {/* Configurado para mantener el tema oscuro siempre */}
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} forcedTheme="dark" disableTransitionOnChange>
           <AuthProvider>
             {children}
