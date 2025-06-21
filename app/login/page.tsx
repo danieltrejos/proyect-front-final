@@ -8,10 +8,9 @@ import { useAuth } from "@/contexts/auth-context";
 export default function LoginPage() {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
-
   useEffect(() => {
     if (!loading && isAuthenticated) {
-      router.push("/dashboard");
+      router.push("/overview");
     }
   }, [isAuthenticated, loading, router]);
 

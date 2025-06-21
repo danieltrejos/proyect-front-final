@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, Loader2, AlertCircle, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,9 +62,22 @@ export function LoginForm() {
     } finally {
       setIsLoading(false);
     }  }
-
   return (
     <div className="w-full max-w-md mx-auto">
+      {/* Botón de volver */}
+      <div className="mb-6">
+        <Link href="/">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/10 transition-all duration-200 group"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
+            Volver al inicio
+          </Button>
+        </Link>
+      </div>
+
       <div className="bg-background/75 rounded-2xl shadow-2xl border dark:border-primary p-8">
         {/* Logo*/}
         <div className="text-center mb-8">
