@@ -34,6 +34,7 @@ import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/hooks/use-toast"
+import { API_ENDPOINTS } from "@/lib/api-config"
 
 const PRODUCT_TYPES = [
   'Amber Ale',
@@ -82,7 +83,7 @@ interface ProductResponse {
 }
 
 // URL base de la API
-const API_URL = "http://localhost:8000/api/v1/products"
+const API_URL = API_ENDPOINTS.products
 
 export function ProductsList() {
   const [products, setProducts] = useState<Product[]>([])
