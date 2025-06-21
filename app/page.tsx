@@ -73,20 +73,20 @@ export default function LandingPage() {
         transition={{ duration: 0.5 }}
       >
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">          <motion.a
-            href="#top"
-            className="flex items-center space-x-2 cursor-pointer"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo_oficial-46D02wUcP1RDrjJLGq04ZPBB4PSlQ5.png"
-              alt="Brewsy Logo"
-              width={64}
-              height={64}
-              className="w-14 h-14"
-            />
-            <span className="text-2xl font-bold text-foreground">Brewsy</span>
-          </motion.a><nav className="hidden md:flex items-center space-x-8">
+          href="#top"
+          className="flex items-center space-x-2 cursor-pointer"
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 300 }}
+        >
+          <Image
+            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo_oficial-46D02wUcP1RDrjJLGq04ZPBB4PSlQ5.png"
+            alt="Brewsy Logo"
+            width={64}
+            height={64}
+            className="w-14 h-14"
+          />
+          <span className="text-2xl font-bold text-foreground">Brewsy</span>
+        </motion.a><nav className="hidden md:flex items-center space-x-8">
             {[
               { name: 'Características', id: 'features' },
               { name: 'Beneficios', id: 'benefits' },
