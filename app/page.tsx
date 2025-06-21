@@ -46,10 +46,9 @@ const slideInRight = {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
+    <div className="min-h-screen bg-background scroll-smooth">{/* Header */}
       <motion.header
-        className="border-b border-border"
+        className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -68,22 +67,25 @@ export default function LandingPage() {
               className="w-14 h-14"
             />
             <span className="text-2xl font-bold text-foreground">Brewsy</span>
-          </motion.div>
-          <nav className="hidden md:flex items-center space-x-8">
-            {['Características', 'Beneficios', 'Contacto'].map((item, index) => (
+          </motion.div>          <nav className="hidden md:flex items-center space-x-8">
+            {[
+              { name: 'Características', id: 'features' },
+              { name: 'Beneficios', id: 'benefits' },
+              { name: 'Contacto', id: 'contact' }
+            ].map((item, index) => (
               <motion.a
-                key={item}
-                href={`#${item.toLowerCase()}`}
+                key={item.name}
+                href={`#${item.id}`}
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
                 whileHover={{ y: -2 }}
               >
-                {item}
+                {item.name}
               </motion.a>
             ))}
-          </nav>          <motion.div
+          </nav><motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -205,8 +207,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
           >
             Diseñada específicamente para la gestión de inventarios de bebidas para bares y licoreras.
-          </motion.p>
-          <motion.div
+          </motion.p>          <motion.div
             className="bg-card rounded-lg shadow-2xl overflow-hidden max-w-6xl mx-auto"
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -215,20 +216,19 @@ export default function LandingPage() {
             whileHover={{ scale: 1.02 }}
           >
             <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-H0OcbI5tOGhFcfTxH8Yn0AdzIxaVKr.png"
+              src="/Interfaz-fluida.png"
               alt="Dashboard de Brewsy mostrando lista de productos"
               width={1200}
               height={800}
               className="w-full h-auto"
+              priority
             />
           </motion.div>
         </div>
-      </motion.section>
-
-      {/* Features Section */}
+      </motion.section>      {/* Features Section */}
       <motion.section
         id="features"
-        className="py-20 px-4"
+        className="py-20 px-4 scroll-mt-20"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-100px" }}
@@ -316,12 +316,10 @@ export default function LandingPage() {
             ))}
           </motion.div>
         </div>
-      </motion.section>
-
-      {/* Benefits Section */}
+      </motion.section>      {/* Benefits Section */}
       <motion.section
         id="benefits"
-        className="py-20 px-4 bg-accent/30"
+        className="py-20 px-4 bg-accent/30 scroll-mt-20"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-100px" }}
@@ -389,9 +387,7 @@ export default function LandingPage() {
                   </motion.div>
                 ))}
               </motion.div>
-            </motion.div>
-
-            <motion.div
+            </motion.div>            <motion.div
               className="bg-card rounded-lg shadow-lg overflow-hidden"
               variants={slideInRight}
               initial="initial"
@@ -401,7 +397,7 @@ export default function LandingPage() {
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
               <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-vRzB5fthu1sOfUyjIvv5CfLEIRyR8Y.png"
+                src="/sistema-inventario.png"
                 alt="Sistema de inventario de Brewsy"
                 width={600}
                 height={400}
@@ -465,12 +461,10 @@ export default function LandingPage() {
             Credenciales de prueba: admin@brewsy.com / admin
           </motion.p>
         </div>
-      </motion.section>
-
-      {/* Footer */}
+      </motion.section>      {/* Footer */}
       <motion.footer
         id="contact"
-        className="py-12 px-4 bg-card border-t border-border"
+        className="py-12 px-4 bg-card border-t border-border scroll-mt-20"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-50px" }}
