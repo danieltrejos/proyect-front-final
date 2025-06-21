@@ -18,11 +18,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Image from "next/image"
+import { useAuth } from "@/contexts/auth-context"
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [configurationOpen, setConfigurationOpen] = useState(false)
+  const { logout, user } = useAuth()
   const routes = [
     {
       href: "/overview",
@@ -240,13 +242,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     <AvatarFallback>U</AvatarFallback>
                   </Avatar>
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
+              </DropdownMenuTrigger>              <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">Admin</p>
+                    <p className="text-sm font-medium leading-none">{user?.name || "Admin"}</p>
                     <p className="text-xs leading-none text-muted-foreground">
-                      Admin@brewsy.com
+                      {user?.email || "admin@brewsy.com"}
                     </p>
                   </div>
                 </DropdownMenuLabel>
@@ -259,11 +260,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Configuración</span>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />                <DropdownMenuItem asChild>
-                  <Link href="/">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Cerrar sesión</span>
-                  </Link>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Cerrar sesión</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/auth-context";
 
 export function LoginForm() {
   const [formData, setFormData] = useState({
@@ -21,7 +20,6 @@ export function LoginForm() {
   const [error, setError] = useState("");
   const router = useRouter();
   const { toast } = useToast();
-  const { login } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -29,6 +27,7 @@ export function LoginForm() {
       ...prev,
       [name]: value,
     }));
+    // Limpiar error cuando el usuario comience a escribir
     if (error) setError("");
   };
 
@@ -37,6 +36,7 @@ export function LoginForm() {
     setIsLoading(true);
     setError("");
 
+    // Validaciones básicas
     if (!formData.email || !formData.password) {
       setError("Por favor, completa todos los campos");
       setIsLoading(false);
@@ -44,28 +44,42 @@ export function LoginForm() {
     }
 
     try {
-      const success = await login(formData.email, formData.password);
-      
-      if (success) {
-        toast({
-          title: "¡Bienvenido!",
-          description: "Has iniciado sesión correctamente.",
-        });
-        
-        // Redirigir al splash screen con mensaje de bienvenida
-        router.push("/splash?welcome=true");
-      } else {
-        setError("Credenciales incorrectas. Usa: admin@brewsy.com / admin");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Credenciales incorrectas");
       }
+
+      const data = await response.json();
+
+      // Guardar el token en localStorage
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Redirigir al splash screen con mensaje de bienvenida
+      router.push("/splash?welcome=true");
     } catch (error) {
-      setError("Error al iniciar sesión. Intenta nuevamente.");
+      setError("Credenciales incorrectas. Verifica tu email y contraseña.");
     } finally {
       setIsLoading(false);
-    }  }
+    }
+  }
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="bg-background/75 rounded-2xl shadow-2xl border dark:border-primary p-8">
+      <div
+        className="bg-background/75 rounded-2xl shadow-2xl border 
+      dark:border-primary p-8"
+      >
         {/* Logo*/}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-6 group">
@@ -73,7 +87,7 @@ export function LoginForm() {
               <img
                 src="/logo_oficial.png"
                 alt="Brewsy Logo"
-                className="w-full h-full object-cover rounded-2xl"
+                className="w-full h-full object-cover"
               />
             </div>
           </Link>
@@ -107,7 +121,7 @@ export function LoginForm() {
               type="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="admin@brewsy.com"
+              placeholder="nombre@ejemplo.com"
               required
               className="h-12 text-base border-gray-300 dark:border-gray-600 focus:border-amber-500 focus:ring-amber-500"
             />
@@ -121,6 +135,12 @@ export function LoginForm() {
               >
                 Contraseña
               </Label>
+              <Link
+                href="/forgot-password"
+                className="text-xs text-amber-600 hover:text-amber-700 transition-colors font-medium"
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
             </div>
             <div className="relative">
               <Input
@@ -130,7 +150,7 @@ export function LoginForm() {
                 value={formData.password}
                 onChange={handleChange}
                 className="h-12 text-base pr-12 border-gray-300 dark:border-gray-600 focus:border-amber-500 focus:ring-amber-500"
-                placeholder="admin"
+                placeholder="Ingresa tu contraseña"
                 required
               />
               <Button
@@ -162,16 +182,16 @@ export function LoginForm() {
           </Button>
         </form>
 
-        {/* Credenciales de prueba */}
-        <div className="text-center mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-          <p className="text-sm text-amber-800 dark:text-amber-200 font-medium mb-1">
-            Credenciales de prueba:
-          </p>
-          <p className="text-xs text-amber-600 dark:text-amber-300">
-            <strong>Usuario:</strong> admin@brewsy.com
-          </p>
-          <p className="text-xs text-amber-600 dark:text-amber-300">
-            <strong>Contraseña:</strong> admin
+        {/* Enlace a registro */}
+        <div className="text-center mt-2">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            ¿No tienes una cuenta?{" "}
+            <Link
+              href="/signup"
+              className="font-semibold text-amber-600 hover:text-amber-700 transition-colors"
+            >
+              Regístrate aquí
+            </Link>
           </p>
         </div>
       </div>

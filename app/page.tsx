@@ -88,10 +88,10 @@ export default function LandingPage() {
             whileTap={{ scale: 0.95 }}
           >
             <Link
-              href="/dashboard"
+              href="/login"
               className="bg-primary text-primary-foreground px-6 py-2 rounded-md font-medium hover:bg-primary/90 transition-colors inline-flex items-center gap-2"
             >
-              Ir al Dashboard
+              Iniciar Sesión
               <motion.div
                 animate={{ x: [0, 4, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
@@ -138,13 +138,12 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
+          >            <motion.div
+            whileHover={{ scale: 1.05, boxShadow: "0 10px 25px rgba(0,0,0,0.1)" }}
+            whileTap={{ scale: 0.95 }}
           >
-            <motion.div
-              whileHover={{ scale: 1.05, boxShadow: "0 10px 25px rgba(0,0,0,0.1)" }}
-              whileTap={{ scale: 0.95 }}
-            >
               <Link
-                href="/dashboard"
+                href="/login"
                 className="bg-primary text-primary-foreground px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary/90 transition-colors inline-flex items-center gap-2 shadow-lg"
               >
                 Comenzar
@@ -444,11 +443,10 @@ export default function LandingPage() {
             transition={{ duration: 0.6, delay: 0.4 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+          >            <Link
+            href="/login"
+            className="bg-background text-foreground px-8 py-4 rounded-lg font-semibold text-lg hover:bg-accent transition-colors inline-flex items-center gap-2 shadow-lg"
           >
-            <Link
-              href="/dashboard"
-              className="bg-background text-foreground px-8 py-4 rounded-lg font-semibold text-lg hover:bg-accent transition-colors inline-flex items-center gap-2 shadow-lg"
-            >
               Comenzar ahora gratis
               <motion.div
                 animate={{ x: [0, 4, 0] }}
@@ -457,15 +455,14 @@ export default function LandingPage() {
                 <ArrowRight className="w-5 h-5" />
               </motion.div>
             </Link>
-          </motion.div>
-          <motion.p
+          </motion.div>          <motion.p
             className="text-primary-foreground/80 mt-4"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            7 días de prueba gratuita • Sin compromisos
+            Credenciales de prueba: admin@brewsy.com / admin
           </motion.p>
         </div>
       </motion.section>
