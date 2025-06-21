@@ -1,22 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 
-export default function SplashPage() {
-  const [progress, setProgress] = useState(0);
-  const router = useRouter();
+// Componente que maneja los search params
+function WelcomeMessage() {
   const searchParams = useSearchParams();
   const welcome = searchParams.get("welcome");
+
+  if (!welcome) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.3 }}
+      className="flex items-center justify-center gap-3 text-green-600 dark:text-green-400"
+    >
+      <CheckCircle className="w-6 h-6" />
+      <span className="text-lg font-semibold">¡Sesión iniciada correctamente!</span>
+    </motion.div>
+  );
+}
+
+// Componente principal de carga
+function SplashContent() {
+  const [progress, setProgress] = useState(0);
+  const router = useRouter();
 
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          router.push("/dashboard");
+          router.push("/overview");
           return 100;
         }
         return prev + 2;
@@ -46,17 +65,9 @@ export default function SplashPage() {
         </motion.div>
 
         {/* Mensaje de bienvenida */}
-        {welcome && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="flex items-center justify-center gap-3 text-green-600 dark:text-green-400"
-          >
-            <CheckCircle className="w-6 h-6" />
-            <span className="text-lg font-semibold">¡Sesión iniciada correctamente!</span>
-          </motion.div>
-        )}
+        <Suspense fallback={null}>
+          <WelcomeMessage />
+        </Suspense>
 
         {/* Título */}
         <motion.div
@@ -94,4 +105,8 @@ export default function SplashPage() {
       </div>
     </div>
   );
+}
+
+export default function SplashPage() {
+  return <SplashContent />;
 }
