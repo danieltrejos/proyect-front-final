@@ -101,18 +101,18 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="p-0 w-64">
           <div className="flex flex-col h-full">            <div className="flex items-center justify-between p-4 border-b">
-              <div className="flex items-center gap-2">
-                <Image
-                  src="/logo_oficial.png"
-                  alt="Brewsy Logo"
-                  width={32}
-                  height={32}
-                  className="w-8 h-8 rounded-full"
-                />
-                <h2 className="text-lg font-bold text-primary">Brewsy</h2>
-              </div>
+            <div className="flex items-center gap-2">
+              <Image
+                src="/logo_oficial.png"
+                alt="Brewsy Logo"
+                width={32}
+                height={32}
+                className="w-8 h-8 rounded-full"
+              />
+              <h2 className="text-lg font-bold text-primary">Brewsy</h2>
+            </div>
 
-            </div><nav className="flex-1 p-4 space-y-2">
+          </div><nav className="flex-1 p-4 space-y-2">
               {routes.map((route) => (
                 <Link
                   key={route.href}
@@ -165,16 +165,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       {/* Desktop Sidebar */}
       <div className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r">
         <div className="flex flex-col h-full">          <div className="flex items-center gap-2 p-6 border-b">
-            {/* <LayoutDashboard className="h-6 w-6" /> */}
-            <Image
-              src="/logo_oficial.png"
-              alt="Metropolitan Logo"
-              width={64}
-              height={64}
-              className="hidden lg:block w-14 h-14 rounded-full"
-            />
-            <h2 className="text-2xl font-bold text-primary">Brewsy</h2>
-          </div><nav className="flex-1 p-4 space-y-2">
+          {/* <LayoutDashboard className="h-6 w-6" /> */}
+          <Image
+            src="/logo_oficial.png"
+            alt="Metropolitan Logo"
+            width={64}
+            height={64}
+            className="hidden lg:block w-14 h-14 rounded-full"
+          />
+          <h2 className="text-2xl font-bold text-primary">Brewsy</h2>
+        </div><nav className="flex-1 p-4 space-y-2">
             {routes.map((route) => (
               <Link
                 key={route.href}

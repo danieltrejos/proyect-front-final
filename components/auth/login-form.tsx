@@ -45,13 +45,13 @@ export function LoginForm() {
 
     try {
       const success = await login(formData.email, formData.password);
-      
+
       if (success) {
         toast({
           title: "¡Bienvenido!",
           description: "Has iniciado sesión correctamente.",
         });
-        
+
         // Redirigir al splash screen con mensaje de bienvenida
         router.push("/splash?welcome=true");
       } else {
@@ -61,7 +61,8 @@ export function LoginForm() {
       setError("Error al iniciar sesión. Intenta nuevamente.");
     } finally {
       setIsLoading(false);
-    }  }
+    }
+  }
   return (
     <div className="w-full max-w-md mx-auto">
       {/* Botón de volver */}
@@ -95,6 +96,18 @@ export function LoginForm() {
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Ingresa tus credenciales para acceder a tu cuenta
+          </p>        </div>
+
+        {/* Credenciales de prueba */}
+        <div className="text-center mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
+          <p className="text-sm text-amber-800 dark:text-amber-200 font-medium mb-1">
+            Credenciales de prueba:
+          </p>
+          <p className="text-xs text-amber-600 dark:text-amber-300">
+            <strong>Correo electrónico:</strong> admin@brewsy.com
+          </p>
+          <p className="text-xs text-amber-600 dark:text-amber-300">
+            <strong>Contraseña:</strong> admin
           </p>
         </div>
 
@@ -170,23 +183,9 @@ export function LoginForm() {
             className="w-full h-12 text-base font-semibold bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
             disabled={isLoading}
           >
-            {isLoading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
-            {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
+            {isLoading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}            {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
           </Button>
         </form>
-
-        {/* Credenciales de prueba */}
-        <div className="text-center mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-          <p className="text-sm text-amber-800 dark:text-amber-200 font-medium mb-1">
-            Credenciales de prueba:
-          </p>
-          <p className="text-xs text-amber-600 dark:text-amber-300">
-            <strong>Usuario:</strong> admin@brewsy.com
-          </p>
-          <p className="text-xs text-amber-600 dark:text-amber-300">
-            <strong>Contraseña:</strong> admin
-          </p>
-        </div>
       </div>
     </div>
   );
