@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ArrowUpDown, RefreshCw } from "lucide-react"
+import { ArrowUpDown, RefreshCw, Package, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { API_ENDPOINTS } from "@/lib/api-config"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "@/hooks/use-toast"
+import { Badge } from "@/components/ui/badge"
 
 interface Product {
   id: number
@@ -37,87 +38,9 @@ export function InventoryManagement() {
   const [restockAmount, setRestockAmount] = useState("")
 
   useEffect(() => {
-    // Fetch products from your API
-    /* 
-        // For demo purposes, using mock data
-        setTimeout(() => {
-          const mockProducts: Product[] = [
-            {
-              id: 1,
-              name: "Hoppy IPA",
-              type: "IPA",
-              price: 7.99,
-              stock: 48,
-              description: "A hoppy India Pale Ale with citrus notes",
-            },
-            {
-              id: 2,
-              name: "Dark Stout",
-              type: "Stout",
-              price: 8.49,
-              stock: 36,
-              description: "Rich and creamy stout with coffee undertones",
-            },
-            {
-              id: 3,
-              name: "Golden Lager",
-              type: "Lager",
-              price: 6.99,
-              stock: 72,
-              description: "Crisp and refreshing traditional lager",
-            },
-            {
-              id: 4,
-              name: "Amber Ale",
-              type: "Ale",
-              price: 7.49,
-              stock: 54,
-              description: "Medium-bodied amber ale with caramel notes",
-            },
-            {
-              id: 5,
-              name: "Wheat Beer",
-              type: "Wheat",
-              price: 7.29,
-              stock: 12,
-              description: "Light and refreshing wheat beer with citrus hints",
-            },
-            {
-              id: 6,
-              name: "Belgian Tripel",
-              type: "Belgian",
-              price: 9.99,
-              stock: 8,
-              description: "Strong Belgian-style tripel with fruity esters",
-            },
-            {
-              id: 7,
-              name: "Sour Cherry",
-              type: "Sour",
-              price: 8.99,
-              stock: 5,
-              description: "Tart and fruity sour beer with cherry flavor",
-            },
-            {
-              id: 8,
-              name: "Porter",
-              type: "Porter",
-              price: 7.99,
-              stock: 18,
-              description: "Robust porter with chocolate and toffee notes",
-            },
-          ]
-          setProducts(mockProducts)
-          setIsLoading(false)
-        }, 1000)
-      } catch (error) {
-        console.error("Failed to fetch products:", error)
-        setIsLoading(false)
-      }
-    } */
-
     fetchProducts()
   }, [])
+
   const fetchProducts = async () => {
     try {
       const response = await fetch(`${API_ENDPOINTS.products}?all=true`)
@@ -137,6 +60,7 @@ export function InventoryManagement() {
       setIsLoading(false)
     }
   }
+
   const handleSort = (column: "name" | "stock") => {
     if (sortBy === column) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc")
@@ -159,6 +83,7 @@ export function InventoryManagement() {
     setRestockAmount("")
     setIsRestockDialogOpen(true)
   }
+
   const handleRestock = async () => {
     if (!currentProduct) return
 
@@ -172,11 +97,13 @@ export function InventoryManagement() {
           variant: "destructive",
         })
         return
-      }      // Enviar solicitud al API para reabastecer el producto
+      }
+
+      // Enviar solicitud al API para reabastecer el producto
       const response = await fetch(`${API_ENDPOINTS.products}/${currentProduct.id}/restock`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount })
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount }),
       })
 
       if (!response.ok) {
@@ -188,9 +115,7 @@ export function InventoryManagement() {
       const updatedProduct = await response.json()
 
       // Actualizar la lista de productos localmente
-      setProducts(products.map(product =>
-        product.id === currentProduct.id ? updatedProduct : product
-      ))
+      setProducts(products.map((product) => (product.id === currentProduct.id ? updatedProduct : product)))
 
       setIsRestockDialogOpen(false)
       setCurrentProduct(null)
@@ -210,115 +135,264 @@ export function InventoryManagement() {
   }
 
   const getLowStockStatus = (stock: number) => {
-    if (stock <= 100) return "bg-red-500/10 text-red-500"
-    if (stock <= 200) return "bg-yellow-500/10 text-yellow-500"
-    return ""
+    if (stock <= 100) return { variant: "destructive" as const, label: "Stock crítico" }
+    if (stock <= 200) return { variant: "secondary" as const, label: "Stock bajo" }
+    return { variant: "default" as const, label: "Stock normal" }
   }
 
+  const getStockColor = (stock: number) => {
+    if (stock <= 100) return "bg-red-500/10 text-red-500"
+    if (stock <= 200) return "bg-yellow-500/10 text-yellow-500"
+    return "bg-green-500/10 text-green-500"
+  }
+
+  // Estadísticas rápidas
+  const lowStockCount = products.filter((p) => p.stock <= 100).length
+  const totalProducts = products.length
+
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Sistema de inventario</h1>
-        <Button variant="outline" onClick={fetchProducts} disabled={isLoading}>
-          <RefreshCw className="mr-2 h-4 w-4" />
-          Actualizar inventario
+    <div className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-6">
+      {/* Header - Mejorado para móviles */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Sistema de inventario</h1>
+          {/* Estadísticas rápidas en móvil */}
+          <div className="flex gap-2 mt-2 sm:hidden">
+            <Badge variant="outline" className="text-xs">
+              {totalProducts} productos
+            </Badge>
+            {lowStockCount > 0 && (
+              <Badge variant="destructive" className="text-xs">
+                <AlertTriangle className="w-3 h-3 mr-1" />
+                {lowStockCount} stock bajo
+              </Badge>
+            )}
+          </div>
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+          {/* Estadísticas en desktop */}
+          <div className="hidden sm:flex gap-2">
+            <Badge variant="outline">{totalProducts} productos</Badge>
+            {lowStockCount > 0 && (
+              <Badge variant="destructive">
+                <AlertTriangle className="w-3 h-3 mr-1" />
+                {lowStockCount} stock bajo
+              </Badge>
+            )}
+          </div>
+          <Button variant="outline" onClick={fetchProducts} disabled={isLoading} className="w-full sm:w-auto">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Actualizar inventario
+          </Button>
+        </div>
+      </div>
+
+      {/* Controles de ordenamiento para móvil */}
+      <div className="flex gap-2 sm:hidden">
+        <Button
+          variant={sortBy === "name" ? "default" : "outline"}
+          size="sm"
+          onClick={() => handleSort("name")}
+          className="flex-1"
+        >
+          Nombre
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+        <Button
+          variant={sortBy === "stock" ? "default" : "outline"}
+          size="sm"
+          onClick={() => handleSort("stock")}
+          className="flex-1"
+        >
+          Stock
+          <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Inventario de Cervezas</CardTitle>
-          <CardDescription>Monitore y gestione el nivel de cervezas.</CardDescription>
+          <CardTitle className="flex items-center gap-2">
+            <Package className="h-5 w-5" />
+            Inventario de Productos
+          </CardTitle>
+          <CardDescription>Monitore y gestione el nivel de productos en inventario.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0 sm:p-6">
           {isLoading ? (
             <div className="flex items-center justify-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>
-                    <Button variant="ghost" onClick={() => handleSort("name")}>
-                      Nombre
-                      <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>
-                    <Button variant="ghost" onClick={() => handleSort("stock")}>
-                      Stock
-                      <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sortedProducts.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center">
-                      No se encontraron productos
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  sortedProducts.map((product) => (
-                    <TableRow key={product.id}>
-                      <TableCell className="font-medium">{product.name}</TableCell>
-                      <TableCell>{product.type}</TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-md ${getLowStockStatus(product.stock)}`}>
-                          {product.stock} unidades
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="outline" size="sm" onClick={() => openRestockDialog(product)}>
-                          <RefreshCw className="mr-2 h-4 w-4" />
-                          Reabastecer
+            <>
+              {/* Vista de tabla para desktop */}
+              <div className="hidden sm:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>
+                        <Button variant="ghost" onClick={() => handleSort("name")}>
+                          Nombre
+                          <ArrowUpDown className="ml-2 h-4 w-4" />
                         </Button>
-                      </TableCell>
+                      </TableHead>
+                      <TableHead>Tipo</TableHead>
+                      <TableHead>
+                        <Button variant="ghost" onClick={() => handleSort("stock")}>
+                          Stock
+                          <ArrowUpDown className="ml-2 h-4 w-4" />
+                        </Button>
+                      </TableHead>
+                      <TableHead className="text-right">Acciones</TableHead>
                     </TableRow>
-                  ))
+                  </TableHeader>
+                  <TableBody>
+                    {sortedProducts.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center">
+                          No se encontraron productos
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      sortedProducts.map((product) => (
+                        <TableRow key={product.id}>
+                          <TableCell className="font-medium">{product.name}</TableCell>
+                          <TableCell>{product.type}</TableCell>
+                          <TableCell>
+                            <span className={`px-2 py-1 rounded-md ${getStockColor(product.stock)}`}>
+                              {product.stock} unidades
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="outline" size="sm" onClick={() => openRestockDialog(product)}>
+                              <RefreshCw className="mr-2 h-4 w-4" />
+                              Reabastecer
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Vista de tarjetas para móvil */}
+              <div className="sm:hidden space-y-3 p-4">
+                {sortedProducts.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground">No se encontraron productos</p>
+                  </div>
+                ) : (
+                  sortedProducts.map((product) => {
+                    const stockStatus = getLowStockStatus(product.stock)
+                    return (
+                      <Card key={product.id} className="relative">
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start mb-3">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-base truncate">{product.name}</h3>
+                              <p className="text-sm text-muted-foreground">{product.type}</p>
+                            </div>
+                            {product.stock <= 100 && (
+                              <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0 ml-2" />
+                            )}
+                          </div>
+
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <Badge variant={stockStatus.variant} className="text-xs">
+                                {product.stock} unidades
+                              </Badge>
+                              <span className="text-xs text-muted-foreground">{stockStatus.label}</span>
+                            </div>
+                          </div>
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openRestockDialog(product)}
+                            className="w-full"
+                          >
+                            <RefreshCw className="mr-2 h-4 w-4" />
+                            Reabastecer
+                          </Button>
+
+                          {product.description && (
+                            <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{product.description}</p>
+                          )}
+                        </CardContent>
+                      </Card>
+                    )
+                  })
                 )}
-              </TableBody>
-            </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
 
+      {/* Dialog para reabastecer - Mejorado para móviles */}
       <Dialog open={isRestockDialogOpen} onOpenChange={setIsRestockDialogOpen}>
-        <DialogContent>
+        <DialogContent className="w-[95vw] max-w-md sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Reabastecer Productos</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <RefreshCw className="h-5 w-5" />
+              Reabastecer Producto
+            </DialogTitle>
             <DialogDescription>
-              {currentProduct && `Agregar mas unidades de ${currentProduct.name} a tu inventario.`}
+              {currentProduct && `Agregar más unidades de ${currentProduct.name} a tu inventario.`}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="restock-amount" className="text-right">
-                Cantidad para adicionar
-              </Label>
+            {/* Información del producto actual */}
+            {currentProduct && (
+              <div className="bg-muted/50 p-3 rounded-lg">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-medium">{currentProduct.name}</span>
+                  <Badge variant="outline">{currentProduct.type}</Badge>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">Stock actual:</span>
+                  <span className={`px-2 py-1 rounded-md ${getStockColor(currentProduct.stock)}`}>
+                    {currentProduct.stock} unidades
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Input para cantidad */}
+            <div className="grid gap-2">
+              <Label htmlFor="restock-amount">Cantidad a agregar</Label>
               <Input
                 id="restock-amount"
                 type="number"
+                placeholder="Ingrese la cantidad"
                 value={restockAmount}
                 onChange={(e) => setRestockAmount(e.target.value)}
-                className="col-span-3"
+                min="1"
               />
             </div>
-            {currentProduct && (
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Stock actual</Label>
-                <div className="col-span-3">{currentProduct.stock} unidades</div>
+
+            {/* Preview del nuevo stock */}
+            {currentProduct && restockAmount && !isNaN(Number(restockAmount)) && Number(restockAmount) > 0 && (
+              <div className="bg-green-50 border border-green-200 p-3 rounded-lg">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-green-700">Nuevo stock:</span>
+                  <span className="font-semibold text-green-700">
+                    {currentProduct.stock + Number(restockAmount)} unidades
+                  </span>
+                </div>
               </div>
             )}
-          </div>          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsRestockDialogOpen(false)}>
+          </div>
+          <DialogFooter className="flex-col gap-2 sm:flex-row">
+            <Button variant="outline" onClick={() => setIsRestockDialogOpen(false)} className="w-full sm:w-auto">
               Cancelar
             </Button>
-            <Button onClick={handleRestock}>Reabastecer</Button>
+            <Button onClick={handleRestock} className="w-full sm:w-auto">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Reabastecer
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
