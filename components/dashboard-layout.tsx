@@ -19,6 +19,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Image from "next/image"
 import { useAuth } from "@/contexts/auth-context"
+import { ScrollToTopButton } from "@/components/ui/scroll-to-top-button"
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -346,15 +347,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   <li>www.brewsy.com</li>
                 </ul>
               </div>
-            </div>
-
-            {/* Copyright */}
+            </div>            {/* Copyright */}
             <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
               <p>&copy; 2025 Brewsy. Todos los derechos reservados. Daniel Trejos - Armando Ledezma - José Ensuncho</p>
             </div>
           </div>
         </footer>
       </div>
+
+      {/* Scroll to Top Button */}
+      <ScrollToTopButton />
     </div>
   )
 }
