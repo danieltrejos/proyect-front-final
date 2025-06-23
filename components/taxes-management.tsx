@@ -2,7 +2,21 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { Edit, MoreHorizontal, Plus, Trash, Calculator, CheckCircle, XCircle, Star } from "lucide-react"
+import {
+  Edit,
+  MoreHorizontal,
+  Plus,
+  Trash,
+  Calculator,
+  CheckCircle,
+  XCircle,
+  Star,
+  Percent,
+  Calendar,
+  ToggleLeft,
+  ToggleRight,
+  RefreshCw,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { API_ENDPOINTS } from "@/lib/api-config"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -99,11 +113,12 @@ export function TaxesManagement() {
   // Manejar cambios en formulario
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }))
   }
+
   // Crear tax
   const handleCreate = async () => {
     if (!formData.name.trim() || !formData.rate.trim()) {
@@ -115,7 +130,7 @@ export function TaxesManagement() {
       return
     }
 
-    const rate = parseFloat(formData.rate)
+    const rate = Number.parseFloat(formData.rate)
     if (isNaN(rate) || rate < 0 || rate > 100) {
       toast({
         title: "Error",
@@ -123,7 +138,9 @@ export function TaxesManagement() {
         variant: "destructive",
       })
       return
-    } setIsCreating(true)
+    }
+
+    setIsCreating(true)
     try {
       const response = await fetch(API_ENDPOINTS.taxes, {
         method: "POST",
@@ -147,7 +164,7 @@ export function TaxesManagement() {
         description: "Impuesto creado exitosamente.",
       })
     } catch (error: any) {
-      console.error("Error al crear impuesto:", error);
+      console.error("Error al crear impuesto:", error)
       toast({
         title: "Error",
         description: error.message || "No se pudo crear el impuesto.",
@@ -157,6 +174,7 @@ export function TaxesManagement() {
       setIsCreating(false)
     }
   }
+
   // Editar tax
   const handleEdit = async () => {
     if (!currentTax || !formData.name.trim() || !formData.rate.trim()) {
@@ -168,7 +186,7 @@ export function TaxesManagement() {
       return
     }
 
-    const rate = parseFloat(formData.rate)
+    const rate = Number.parseFloat(formData.rate)
     if (isNaN(rate) || rate < 0 || rate > 100) {
       toast({
         title: "Error",
@@ -176,7 +194,9 @@ export function TaxesManagement() {
         variant: "destructive",
       })
       return
-    } setIsUpdating(true)
+    }
+
+    setIsUpdating(true)
     try {
       const response = await fetch(`${API_ENDPOINTS.taxes}/${currentTax.id}`, {
         method: "PATCH",
@@ -201,7 +221,7 @@ export function TaxesManagement() {
         description: "Impuesto actualizado exitosamente.",
       })
     } catch (error: any) {
-      console.error("Error al actualizar impuesto:", error);
+      console.error("Error al actualizar impuesto:", error)
       toast({
         title: "Error",
         description: error.message || "No se pudo actualizar el impuesto.",
@@ -262,7 +282,7 @@ export function TaxesManagement() {
       await fetchTaxes()
       toast({
         title: "Éxito",
-        description: `Impuesto ${tax.isActive ? 'desactivado' : 'activado'} exitosamente.`,
+        description: `Impuesto ${tax.isActive ? "desactivado" : "activado"} exitosamente.`,
       })
     } catch (error: any) {
       console.error("Error al cambiar estado:", error)
@@ -300,6 +320,7 @@ export function TaxesManagement() {
       })
     }
   }
+
   // Preparar edición
   const prepareEdit = (tax: Tax) => {
     setCurrentTax(tax)
@@ -316,74 +337,125 @@ export function TaxesManagement() {
     setDeleteDialogOpen(true)
   }
 
+  // Estadísticas
+  const activeTaxes = taxes.filter((tax) => tax.isActive).length
+  const defaultTax = taxes.find((tax) => tax.isDefault)
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-lg">Cargando impuestos...</div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-6">
+      {/* Header - Mejorado para móviles */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Gestión de Impuestos</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Gestión de Impuestos</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
             Administra los impuestos disponibles en el sistema
           </p>
+          {/* Estadísticas rápidas en móvil */}
+          <div className="flex gap-2 mt-2 sm:hidden">
+            <Badge variant="outline" className="text-xs">
+              <Calculator className="w-3 h-3 mr-1" />
+              {taxes.length} impuestos
+            </Badge>
+            <Badge variant="secondary" className="text-xs">
+              <CheckCircle className="w-3 h-3 mr-1" />
+              {activeTaxes} activos
+            </Badge>
+            {defaultTax && (
+              <Badge variant="default" className="text-xs">
+                <Star className="w-3 h-3 mr-1" />
+                {defaultTax.rate}% por defecto
+              </Badge>
+            )}
+          </div>
         </div>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Agregar Impuesto
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Agregar Nuevo Impuesto</DialogTitle>
-              <DialogDescription>
-                Ingresa los detalles del nuevo impuesto.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Nombre
-                </Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  placeholder="ej. IVA"
-                />
-              </div>              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="rate" className="text-right">
-                  Porcentaje
-                </Label>
-                <Input
-                  id="rate"
-                  name="rate"
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.01"
-                  value={formData.rate}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  placeholder="ej. 19"
-                />
-              </div>
-            </div>            <DialogFooter>
-              <Button onClick={handleCreate} disabled={isCreating}>
-                {isCreating ? "Creando..." : "Crear Impuesto"}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+          {/* Estadísticas en desktop */}
+          <div className="hidden sm:flex gap-2">
+            <Badge variant="outline">
+              <Calculator className="w-3 h-3 mr-1" />
+              {taxes.length} impuestos
+            </Badge>
+            <Badge variant="secondary">
+              <CheckCircle className="w-3 h-3 mr-1" />
+              {activeTaxes} activos
+            </Badge>
+            {defaultTax && (
+              <Badge variant="default">
+                <Star className="w-3 h-3 mr-1" />
+                {defaultTax.rate}% por defecto
+              </Badge>
+            )}
+          </div>
+          <Button onClick={fetchTaxes} variant="outline" className="w-full sm:w-auto">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Actualizar
+          </Button>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="w-full sm:w-auto">
+                <Plus className="mr-2 h-4 w-4" />
+                Agregar Impuesto
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent className="w-[95vw] max-w-md sm:max-w-lg">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Calculator className="h-5 w-5" />
+                  Agregar Nuevo Impuesto
+                </DialogTitle>
+                <DialogDescription>Ingresa los detalles del nuevo impuesto.</DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="name" className="flex items-center gap-2">
+                    <Calculator className="h-4 w-4" />
+                    Nombre del Impuesto
+                  </Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    placeholder="ej. IVA, ISR, etc."
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="rate" className="flex items-center gap-2">
+                    <Percent className="h-4 w-4" />
+                    Porcentaje (0-100)
+                  </Label>
+                  <Input
+                    id="rate"
+                    name="rate"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={formData.rate}
+                    onChange={handleInputChange}
+                    placeholder="ej. 19.00"
+                  />
+                </div>
+              </div>
+              <DialogFooter className="flex-col gap-2 sm:flex-row">
+                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="w-full sm:w-auto">
+                  Cancelar
+                </Button>
+                <Button onClick={handleCreate} disabled={isCreating} className="w-full sm:w-auto">
+                  {isCreating ? "Creando..." : "Crear Impuesto"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <Card>
@@ -392,121 +464,243 @@ export function TaxesManagement() {
             <Calculator className="h-5 w-5" />
             Impuestos Registrados
           </CardTitle>
-          <CardDescription>
-            Lista de todos los impuestos configurados en el sistema
-          </CardDescription>
+          <CardDescription>Lista de todos los impuestos configurados en el sistema</CardDescription>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Porcentaje</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Predeterminado</TableHead>
-                <TableHead>Fecha Creación</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {taxes.map((tax) => (
-                <TableRow key={tax.id}>
-                  <TableCell className="font-medium">{tax.name}</TableCell>
-                  <TableCell>{tax.rate}%</TableCell>
-                  <TableCell>
-                    <Badge variant={tax.isActive ? "default" : "secondary"}>
-                      {tax.isActive ? "Activo" : "Inactivo"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {tax.isDefault && (
-                      <Badge variant="outline" className="text-yellow-600 border-yellow-600">
-                        <Star className="w-3 h-3 mr-1" />
-                        Predeterminado
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {new Date(tax.createdAt).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Abrir menú</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => prepareEdit(tax)}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => toggleTaxStatus(tax)}
-                        >
-                          {tax.isActive ? (
-                            <XCircle className="mr-2 h-4 w-4" />
-                          ) : (
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                          )}
-                          {tax.isActive ? "Desactivar" : "Activar"}
-                        </DropdownMenuItem>
-                        {!tax.isDefault && tax.isActive && (
-                          <DropdownMenuItem onClick={() => setAsDefault(tax)}>
-                            <Star className="mr-2 h-4 w-4" />
-                            Establecer como predeterminado
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem
-                          onClick={() => prepareDelete(tax)}
-                          className="text-red-600"
-                        >
-                          <Trash className="mr-2 h-4 w-4" />
-                          Eliminar
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {taxes.length === 0 && (
+        <CardContent className="p-0 sm:p-6">
+          {/* Vista de tabla para desktop */}
+          <div className="hidden lg:block rounded-md border">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground">
-                    No hay impuestos registrados
-                  </TableCell>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Porcentaje</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead>Predeterminado</TableHead>
+                  <TableHead>Fecha Creación</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {taxes.map((tax) => (
+                  <TableRow key={tax.id}>
+                    <TableCell className="font-medium">{tax.name}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{tax.rate}%</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={tax.isActive ? "default" : "secondary"}>
+                        {tax.isActive ? (
+                          <>
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Activo
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="w-3 h-3 mr-1" />
+                            Inactivo
+                          </>
+                        )}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {tax.isDefault && (
+                        <Badge variant="outline" className="text-yellow-600 border-yellow-600">
+                          <Star className="w-3 h-3 mr-1" />
+                          Predeterminado
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>{new Date(tax.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Abrir menú</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                          <DropdownMenuItem onClick={() => prepareEdit(tax)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => toggleTaxStatus(tax)}>
+                            {tax.isActive ? (
+                              <XCircle className="mr-2 h-4 w-4" />
+                            ) : (
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                            )}
+                            {tax.isActive ? "Desactivar" : "Activar"}
+                          </DropdownMenuItem>
+                          {!tax.isDefault && tax.isActive && (
+                            <DropdownMenuItem onClick={() => setAsDefault(tax)}>
+                              <Star className="mr-2 h-4 w-4" />
+                              Establecer como predeterminado
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem onClick={() => prepareDelete(tax)} className="text-red-600">
+                            <Trash className="mr-2 h-4 w-4" />
+                            Eliminar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {taxes.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                      No hay impuestos registrados
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Vista de tarjetas para móvil y tablet */}
+          <div className="lg:hidden space-y-4 p-4">
+            {taxes.length === 0 ? (
+              <div className="text-center py-8">
+                <Calculator className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">No hay impuestos registrados</p>
+              </div>
+            ) : (
+              taxes.map((tax) => (
+                <Card key={tax.id}>
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-lg truncate">{tax.name}</h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge variant="outline" className="text-sm">
+                            <Percent className="w-3 h-3 mr-1" />
+                            {tax.rate}%
+                          </Badge>
+                          <Badge variant={tax.isActive ? "default" : "secondary"} className="text-xs">
+                            {tax.isActive ? (
+                              <>
+                                <CheckCircle className="w-3 h-3 mr-1" />
+                                Activo
+                              </>
+                            ) : (
+                              <>
+                                <XCircle className="w-3 h-3 mr-1" />
+                                Inactivo
+                              </>
+                            )}
+                          </Badge>
+                          {tax.isDefault && (
+                            <Badge variant="outline" className="text-xs text-yellow-600 border-yellow-600">
+                              <Star className="w-3 h-3 mr-1" />
+                              Predeterminado
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Abrir menú</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                          <DropdownMenuItem onClick={() => prepareEdit(tax)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => toggleTaxStatus(tax)}>
+                            {tax.isActive ? (
+                              <XCircle className="mr-2 h-4 w-4" />
+                            ) : (
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                            )}
+                            {tax.isActive ? "Desactivar" : "Activar"}
+                          </DropdownMenuItem>
+                          {!tax.isDefault && tax.isActive && (
+                            <DropdownMenuItem onClick={() => setAsDefault(tax)}>
+                              <Star className="mr-2 h-4 w-4" />
+                              Establecer como predeterminado
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem onClick={() => prepareDelete(tax)} className="text-red-600">
+                            <Trash className="mr-2 h-4 w-4" />
+                            Eliminar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2 pt-2 border-t">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">
+                          Creado: {new Date(tax.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Acciones rápidas en móvil */}
+                    <div className="flex gap-2 mt-4">
+                      <Button variant="outline" size="sm" onClick={() => toggleTaxStatus(tax)} className="flex-1">
+                        {tax.isActive ? (
+                          <>
+                            <ToggleLeft className="h-4 w-4 mr-2" />
+                            Desactivar
+                          </>
+                        ) : (
+                          <>
+                            <ToggleRight className="h-4 w-4 mr-2" />
+                            Activar
+                          </>
+                        )}
+                      </Button>
+                      {!tax.isDefault && tax.isActive && (
+                        <Button variant="outline" size="sm" onClick={() => setAsDefault(tax)} className="flex-1">
+                          <Star className="h-4 w-4 mr-2" />
+                          Por defecto
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
         </CardContent>
       </Card>
 
-      {/* Dialog de Edición */}
+      {/* Dialog de Edición - Mejorado para móviles */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="w-[95vw] max-w-md sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Editar Impuesto</DialogTitle>
-            <DialogDescription>
-              Modifica los detalles del impuesto.
-            </DialogDescription>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit className="h-5 w-5" />
+              Editar Impuesto
+            </DialogTitle>
+            <DialogDescription>Modifica los detalles del impuesto.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-name" className="text-right">
-                Nombre
+            <div className="grid gap-2">
+              <Label htmlFor="edit-name" className="flex items-center gap-2">
+                <Calculator className="h-4 w-4" />
+                Nombre del Impuesto
               </Label>
               <Input
                 id="edit-name"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className="col-span-3"
+                placeholder="ej. IVA, ISR, etc."
               />
-            </div>            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-rate" className="text-right">
-                Porcentaje
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-rate" className="flex items-center gap-2">
+                <Percent className="h-4 w-4" />
+                Porcentaje (0-100)
               </Label>
               <Input
                 id="edit-rate"
@@ -517,30 +711,38 @@ export function TaxesManagement() {
                 step="0.01"
                 value={formData.rate}
                 onChange={handleInputChange}
-                className="col-span-3"
+                placeholder="ej. 19.00"
               />
             </div>
-          </div>          <DialogFooter>
-            <Button onClick={handleEdit} disabled={isUpdating}>
+          </div>
+          <DialogFooter className="flex-col gap-2 sm:flex-row">
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="w-full sm:w-auto">
+              Cancelar
+            </Button>
+            <Button onClick={handleEdit} disabled={isUpdating} className="w-full sm:w-auto">
               {isUpdating ? "Guardando..." : "Guardar Cambios"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Dialog de Confirmación de Eliminación */}
+      {/* Dialog de Confirmación de Eliminación - Mejorado para móviles */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="w-[95vw] max-w-md sm:max-w-lg">
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash className="h-5 w-5 text-red-500" />
+              ¿Estás seguro?
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. Esto eliminará permanentemente el impuesto
-              "{taxToDelete?.name}" del sistema.
+              Esta acción no se puede deshacer. Esto eliminará permanentemente el impuesto "
+              <span className="font-semibold">{taxToDelete?.name}</span>" ({taxToDelete?.rate}%) del sistema.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+          <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
+            <AlertDialogCancel className="w-full sm:w-auto">Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700 w-full sm:w-auto">
+              <Trash className="mr-2 h-4 w-4" />
               Eliminar
             </AlertDialogAction>
           </AlertDialogFooter>
