@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Overview } from "@/components/overview"
 import { RecentSales } from "@/components/recent-sales"
 import { fetchDashboardStats, DashboardStats } from "@/lib/stats-api"
+import { useRouter } from "next/navigation"
 
 export function DashboardOverview() {
   const [isLoading, setIsLoading] = useState(true)
@@ -16,6 +17,7 @@ export function DashboardOverview() {
     monthlyRevenue: 0,
   })
   const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,6 +46,12 @@ export function DashboardOverview() {
     }).format(amount)
   }
 
+  // Funciones de navegación
+  const navigateToProducts = () => router.push('/products')
+  const navigateToInventory = () => router.push('/inventory')
+  const navigateToPOS = () => router.push('/pos')
+  const navigateToSalesHistory = () => router.push('/sales-history')
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
@@ -56,13 +64,15 @@ export function DashboardOverview() {
             <p className="text-red-600">{error}</p>
           </CardContent>
         </Card>
-      )}
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+      )}      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {/* Card Total de productos */}
+        <Card
+          className="cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50 active:scale-95"
+          onClick={navigateToProducts}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total de productos</CardTitle>
-            <Beer className="h-4 w-4 text-muted-foreground" />
+            <Beer className="h-4 w-4 text-muted-foreground transition-colors hover:text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -72,10 +82,14 @@ export function DashboardOverview() {
           </CardContent>
         </Card>
 
-        <Card>
+        {/* Card Productos con bajo stock */}
+        <Card
+          className="cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50 active:scale-95"
+          onClick={navigateToInventory}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Productos con bajo stock</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+            <Package className="h-4 w-4 text-muted-foreground transition-colors hover:text-primary" />
           </CardHeader>
           <CardContent>            <div className="text-2xl font-bold">
             {isLoading ? "Cargando..." : stats.lowStockCount}
@@ -84,10 +98,14 @@ export function DashboardOverview() {
           </CardContent>
         </Card>
 
-        <Card>
+        {/* Card Ventas este mes */}
+        <Card
+          className="cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50 active:scale-95"
+          onClick={navigateToPOS}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Ventas este mes</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <TrendingUp className="h-4 w-4 text-muted-foreground transition-colors hover:text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -97,10 +115,14 @@ export function DashboardOverview() {
           </CardContent>
         </Card>
 
-        <Card>
+        {/* Card Ingresos este mes */}
+        <Card
+          className="cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-primary/50 active:scale-95"
+          onClick={navigateToSalesHistory}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Ingresos este mes</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <DollarSign className="h-4 w-4 text-muted-foreground transition-colors hover:text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
