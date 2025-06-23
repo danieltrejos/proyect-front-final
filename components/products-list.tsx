@@ -646,17 +646,17 @@ export function ProductsList() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                                <DropdownMenuItem onClick={() => openEditDialog(product)}>
+                                <DropdownMenuLabel>Acciones</DropdownMenuLabel>                                <DropdownMenuItem onClick={() => openEditDialog(product)}>
                                   <Edit className="mr-2 h-4 w-4" />
                                   Editar
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() => handleDeleteProduct(product.id)}
-                                  className="text-red-600"
+                                  disabled
+                                  className="text-muted-foreground"
                                 >
                                   <Trash className="mr-2 h-4 w-4" />
-                                  Eliminar
+                                  Eliminar (Disabled)
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -688,17 +688,17 @@ export function ProductsList() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                              <DropdownMenuItem onClick={() => openEditDialog(product)}>
+                              <DropdownMenuLabel>Acciones</DropdownMenuLabel>                              <DropdownMenuItem onClick={() => openEditDialog(product)}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Editar
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => handleDeleteProduct(product.id)}
-                                className="text-red-600"
+                                disabled
+                                className="text-muted-foreground"
                               >
                                 <Trash className="mr-2 h-4 w-4" />
-                                Eliminar
+                                Eliminar (Disabled)
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
