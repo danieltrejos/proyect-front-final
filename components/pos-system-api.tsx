@@ -304,9 +304,7 @@ export function PosSystem() {
                     variant: "destructive",
                 })
                 return
-            }
-
-            const amount = Number.parseFloat(paymentAmount)
+            } const amount = Number.parseFloat(paymentAmount)
 
             if (isNaN(amount)) {
                 toast({
@@ -315,23 +313,27 @@ export function PosSystem() {
                     variant: "destructive",
                 })
                 return
-            } const total = getTotalWithTax()
+            }
 
-            if (amount < total) {
+            const totalWithTax = getTotalWithTax()
+
+            if (amount < totalWithTax) {
                 toast({
                     title: "Error",
                     description: "El monto de pago es menor que el total",
                     variant: "destructive",
                 })
                 return
-            }// Preparar datos para la venta
-            const change = amount - total;
+            }
 
-            // Calcular subtotal e impuestos
-            const subtotal = total;
+            // ✅ CÁLCULOS CORREGIDOS
+            const change = amount - totalWithTax;
+
+            // Calcular correctamente subtotal e impuestos
+            const subtotal = getCartTotal(); // Subtotal SIN impuestos
             const taxRate = defaultTax?.rate || 0;
-            const taxAmount = subtotal * (taxRate / 100);
-            const totalWithTax = subtotal + taxAmount;
+            const taxAmount = getTaxAmount(); // Impuesto calculado correctamente
+            const total = totalWithTax; // Total CON impuestos
 
             // Verificar que tenemos la información necesaria
             if (!company) {
@@ -349,19 +351,19 @@ export function PosSystem() {
                     quantity: item.quantity,
                     price: item.product.price
                 })),
-                subtotal,
-                taxAmount,
+                subtotal, // ✅ Subtotal correcto SIN impuestos
+                taxAmount, // ✅ Impuesto correcto
                 taxRate,
-                total: totalWithTax,
+                total, // ✅ Total correcto CON impuestos
                 paymentAmount: amount,
-                change: amount - totalWithTax,
-                paymentMethod: "Efectivo", // Default payment method
+                change: change,
+                paymentMethod: "Efectivo",
                 customerId: selectedCustomer ? parseInt(selectedCustomer) : undefined,
                 userId: parseInt(selectedUser),
                 companyId: company.id
             };
 
-            console.log("Enviando datos de venta:", saleData);            // Crear la venta en el backend
+            console.log("Enviando datos de venta:", saleData);// Crear la venta en el backend
             const response = await fetch(API_ENDPOINTS.sales, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
