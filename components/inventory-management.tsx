@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ArrowUpDown, RefreshCw, Package, AlertTriangle } from "lucide-react"
+import { ArrowUpDown, RefreshCw, Package, AlertTriangle, Minus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { API_ENDPOINTS } from "@/lib/api-config"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -34,8 +34,10 @@ export function InventoryManagement() {
   const [sortBy, setSortBy] = useState<"name" | "stock">("name")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [isRestockDialogOpen, setIsRestockDialogOpen] = useState(false)
+  const [isOutboundDialogOpen, setIsOutboundDialogOpen] = useState(false)
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null)
   const [restockAmount, setRestockAmount] = useState("")
+  const [outboundAmount, setOutboundAmount] = useState("")
 
   useEffect(() => {
     fetchProducts()
@@ -84,6 +86,12 @@ export function InventoryManagement() {
     setIsRestockDialogOpen(true)
   }
 
+  const openOutboundDialog = (product: Product) => {
+    setCurrentProduct(product)
+    setOutboundAmount("")
+    setIsOutboundDialogOpen(true)
+  }
+
   const handleRestock = async () => {
     if (!currentProduct) return
 
@@ -129,6 +137,66 @@ export function InventoryManagement() {
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "No se pudo reabastecer el producto",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleOutbound = async () => {
+    if (!currentProduct) return
+
+    try {
+      const amount = Number.parseInt(outboundAmount)
+
+      if (isNaN(amount) || amount <= 0) {
+        toast({
+          title: "Error",
+          description: "Por favor ingrese una cantidad válida",
+          variant: "destructive",
+        })
+        return
+      }
+
+      if (amount > currentProduct.stock) {
+        toast({
+          title: "Error",
+          description: `Stock insuficiente. Stock disponible: ${currentProduct.stock}`,
+          variant: "destructive",
+        })
+        return
+      }
+
+      // Enviar solicitud al API para registrar salida del producto
+      const response = await fetch(`${API_ENDPOINTS.products}/${currentProduct.id}/outbound`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Error HTTP: ${response.status}`)
+      }
+
+      // Obtener el producto actualizado desde la respuesta
+      const updatedProduct = await response.json()
+
+      // Actualizar la lista de productos localmente
+      setProducts(products.map((product) => (product.id === currentProduct.id ? updatedProduct : product)))
+
+      setIsOutboundDialogOpen(false)
+      setCurrentProduct(null)
+      setOutboundAmount("")
+
+      toast({
+        title: "Éxito",
+        description: `Se registraron ${amount} unidades de salida de ${currentProduct.name}`,
+      })
+    } catch (error) {
+      console.error("Error al registrar salida:", error)
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "No se pudo registrar la salida",
         variant: "destructive",
       })
     }
@@ -261,12 +329,22 @@ export function InventoryManagement() {
                             <span className={`px-2 py-1 rounded-md ${getStockColor(product.stock)}`}>
                               {product.stock} unidades
                             </span>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button variant="outline" size="sm" onClick={() => openRestockDialog(product)}>
-                              <RefreshCw className="mr-2 h-4 w-4" />
-                              Reabastecer
-                            </Button>
+                          </TableCell>                          <TableCell className="text-right">
+                            <div className="flex gap-2 justify-end">
+                              <Button variant="outline" size="sm" onClick={() => openRestockDialog(product)}>
+                                <RefreshCw className="mr-2 h-4 w-4" />
+                                Reabastecer
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => openOutboundDialog(product)}
+                                disabled={product.stock === 0}
+                              >
+                                <Minus className="mr-2 h-4 w-4" />
+                                Salida
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))
@@ -305,17 +383,27 @@ export function InventoryManagement() {
                               </Badge>
                               <span className="text-xs text-muted-foreground">{stockStatus.label}</span>
                             </div>
+                          </div>                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openRestockDialog(product)}
+                              className="flex-1"
+                            >
+                              <RefreshCw className="mr-2 h-4 w-4" />
+                              Reabastecer
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openOutboundDialog(product)}
+                              disabled={product.stock === 0}
+                              className="flex-1"
+                            >
+                              <Minus className="mr-2 h-4 w-4" />
+                              Salida
+                            </Button>
                           </div>
-
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => openRestockDialog(product)}
-                            className="w-full"
-                          >
-                            <RefreshCw className="mr-2 h-4 w-4" />
-                            Reabastecer
-                          </Button>
 
                           {product.description && (
                             <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{product.description}</p>
@@ -392,6 +480,116 @@ export function InventoryManagement() {
             <Button onClick={handleRestock} className="w-full sm:w-auto">
               <RefreshCw className="mr-2 h-4 w-4" />
               Reabastecer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog para salida de inventario - Mejorado para móviles */}
+      <Dialog open={isOutboundDialogOpen} onOpenChange={setIsOutboundDialogOpen}>
+        <DialogContent className="w-[95vw] max-w-md sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Minus className="h-5 w-5" />
+              Registrar Salida de Producto
+            </DialogTitle>
+            <DialogDescription>
+              {currentProduct && `Reducir stock de ${currentProduct.name} del inventario.`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            {/* Información del producto actual */}
+            {currentProduct && (
+              <div className="bg-muted/50 p-3 rounded-lg">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-medium">{currentProduct.name}</span>
+                  <Badge variant="outline">{currentProduct.type}</Badge>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">Stock actual:</span>
+                  <span className={`px-2 py-1 rounded-md ${getStockColor(currentProduct.stock)}`}>
+                    {currentProduct.stock} unidades
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Input para cantidad */}
+            <div className="grid gap-2">
+              <Label htmlFor="outbound-amount">Cantidad de salida</Label>
+              <Input
+                id="outbound-amount"
+                type="number"
+                placeholder="Ingrese la cantidad"
+                value={outboundAmount}
+                onChange={(e) => setOutboundAmount(e.target.value)}
+                min="1"
+                max={currentProduct?.stock || 0}
+                className={
+                  currentProduct &&
+                    outboundAmount &&
+                    !isNaN(Number(outboundAmount)) &&
+                    Number(outboundAmount) > currentProduct.stock
+                    ? "border-red-500 focus:border-red-500"
+                    : ""
+                }
+              />
+              {currentProduct &&
+                outboundAmount &&
+                !isNaN(Number(outboundAmount)) &&
+                Number(outboundAmount) > currentProduct.stock && (
+                  <p className="text-red-500 text-sm">
+                    Stock insuficiente. Máximo disponible: {currentProduct.stock}
+                  </p>
+                )}
+            </div>
+
+            {/* Preview del nuevo stock */}
+            {currentProduct &&
+              outboundAmount &&
+              !isNaN(Number(outboundAmount)) &&
+              Number(outboundAmount) > 0 &&
+              Number(outboundAmount) <= currentProduct.stock && (
+                <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-blue-700">Nuevo stock:</span>
+                    <span
+                      className={`font-semibold ${currentProduct.stock - Number(outboundAmount) <= 100
+                          ? "text-red-700"
+                          : currentProduct.stock - Number(outboundAmount) <= 200
+                            ? "text-yellow-700"
+                            : "text-blue-700"
+                        }`}
+                    >
+                      {currentProduct.stock - Number(outboundAmount)} unidades
+                    </span>
+                  </div>
+                  {currentProduct.stock - Number(outboundAmount) <= 100 && (
+                    <p className="text-red-600 text-xs mt-1">⚠️ El stock quedará en nivel crítico</p>
+                  )}
+                  {currentProduct.stock - Number(outboundAmount) <= 200 &&
+                    currentProduct.stock - Number(outboundAmount) > 100 && (
+                      <p className="text-yellow-600 text-xs mt-1">⚠️ El stock quedará en nivel bajo</p>
+                    )}
+                </div>
+              )}
+          </div>
+          <DialogFooter className="flex-col gap-2 sm:flex-row">
+            <Button variant="outline" onClick={() => setIsOutboundDialogOpen(false)} className="w-full sm:w-auto">
+              Cancelar
+            </Button>            <Button
+              onClick={handleOutbound}
+              disabled={
+                !outboundAmount ||
+                isNaN(Number(outboundAmount)) ||
+                Number(outboundAmount) <= 0 ||
+                !currentProduct ||
+                Number(outboundAmount) > currentProduct.stock
+              }
+              className="w-full sm:w-auto"
+            >
+              <Minus className="mr-2 h-4 w-4" />
+              Registrar Salida
             </Button>
           </DialogFooter>
         </DialogContent>
