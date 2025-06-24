@@ -168,7 +168,7 @@ export default function LandingPage() {
                 href="https://drive.google.com/drive/folders/1SFxybBPXwc_j2yadmy4M7jZpYtNsE5Re?usp=sharing"
                 target="_blank"
               >
-                Ver Manual
+                Ver Documentos
               </Link>
 
             </motion.button>
